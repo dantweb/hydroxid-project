@@ -23,15 +23,19 @@ plugins:
     config:
       products_per_page: 8
   checkout: {}
+  # pay1 offers Stripe and Mollie (PayPal's module is not installed there). Inline (iframe) mode;
+  # the values are PUBLIC by design (publishable key, profile id) — never a secret key.
   payment-stripe:
     config:
-      mode: redirect # hosted Stripe page: no keys in this repo
-  payment-paypal:
-    config:
-      mode: redirect
+      mode: iframe
+      publishable_key: pk_test_51U2oboD514s7wzZp9C41voTZpZ0aK1TSv6JaAWPlszRaegsUdnILV2JHuxF0GjpqywBs3Afzrg0qrVq81vMmSX2w00W7Fl9qDT
   payment-mollie:
     config:
-      mode: redirect
+      mode: iframe
+      profile_id: pfl_cVf8bSWdQV
+      test_mode: true
+      locale: en_US
+      methods: [creditcard, ideal, bancontact]
   dashboard: {} # replaced by plugins/dashboard-override (same name)
   hydroxid: {} # extends the peroxid layout plugin (header, front page, search) — needs `shop`
   gdpr-cookie-consent:

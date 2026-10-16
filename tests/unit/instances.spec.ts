@@ -45,8 +45,11 @@ describe('instances', () => {
       );
       // the extending plugin is listed after the plugins whose slots it overrides
       expect(plugins.indexOf('hydroxid')).toBeGreaterThan(plugins.indexOf('shop'));
-      // no keys in the repo: hosted payment pages
-      expect(config.plugins['payment-stripe'].config.mode).toBe('redirect');
+      // pay1 offers Stripe and Mollie, inline (iframe) with their PUBLIC values only
+      expect(config.plugins['payment-stripe'].config).toMatchObject({ mode: 'iframe' });
+      expect(config.plugins['payment-stripe'].config.publishable_key).toMatch(/^pk_test_/);
+      expect(config.plugins['payment-mollie'].config).toMatchObject({ mode: 'iframe' });
+      expect(config.plugins['payment-paypal']).toBeUndefined(); // not installed on pay1
     },
   );
 });
