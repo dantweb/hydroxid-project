@@ -1,0 +1,29 @@
+{
+  "title": "Ihre Privatsphäre ist uns wichtig",
+  "summary": "Wir verwenden Cookies, um diesen Shop zu betreiben und — mit Ihrer Einwilligung — um die Nutzung zu verstehen und zu personalisieren.",
+  "privacyLink": "Datenschutzerklärung",
+  "acceptAll": "Alle akzeptieren",
+  "rejectAll": "Alle ablehnen",
+  "customize": "Anpassen",
+  "customizeTitle": "Cookie-Einstellungen",
+  "save": "Auswahl speichern",
+  "settings": "Cookie-Einstellungen",
+  "categories": {
+    "necessary": {
+      "name": "Unbedingt erforderlich",
+      "purpose": "Halten den Shop am Laufen: Sitzung, Warenkorb und Sicherheit. Immer aktiv."
+    },
+    "preferences": {
+      "name": "Präferenzen",
+      "purpose": "Merken Einstellungen wie die Sprache."
+    },
+    "statistics": {
+      "name": "Statistik",
+      "purpose": "Anonyme Messungen, die uns helfen, den Shop zu verbessern."
+    },
+    "marketing": {
+      "name": "Marketing",
+      "purpose": "Personalisierte Angebote und Kampagnenmessung."
+    }
+  }
+}

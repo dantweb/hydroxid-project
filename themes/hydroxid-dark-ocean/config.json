@@ -1,0 +1,23 @@
+{
+  "id": "hydroxid-dark-ocean",
+  "name": "HydroXid Dark Ocean",
+  "description": "Deep navy surfaces with aqua accents — IBM Plex Sans",
+  "version": "1.0.0",
+  "parent": "default",
+  "tokens": {
+    "--oxfe-color-primary": "#22d3ee",
+    "--oxfe-color-primary-contrast": "#04202b",
+    "--oxfe-color-primary-disabled": "#1f5666",
+    "--oxfe-color-text": "#eaf6ff",
+    "--oxfe-color-text-muted": "#9fc3d8",
+    "--oxfe-color-border": "#1e4a63",
+    "--oxfe-color-input-border": "#2f6b8a",
+    "--oxfe-color-background": "#06141f",
+    "--oxfe-color-surface": "#0e2a3d",
+    "--oxfe-color-link": "#67e8f9",
+    "--oxfe-color-accent": "#2dd4bf",
+    "--oxfe-color-danger": "#ff6b81",
+    "--oxfe-font-family": "'IBM Plex Sans', 'Segoe UI', Roboto, sans-serif",
+    "--oxfe-font-heading": "'IBM Plex Sans', 'Segoe UI', Roboto, sans-serif"
+  }
+}

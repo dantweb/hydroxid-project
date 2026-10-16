@@ -1,0 +1,10 @@
+node_modules/
+dist/
+public/themes/
+themes/*/fonts/
+build/
+coverage/
+playwright-report/
+test-results/
+.env
+*.log

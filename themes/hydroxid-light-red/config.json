@@ -1,0 +1,23 @@
+{
+  "id": "hydroxid-light-red",
+  "name": "HydroXid Light Red",
+  "description": "Warm light surfaces with a confident red — Playfair Display headings over Lato",
+  "version": "1.0.0",
+  "parent": "default",
+  "tokens": {
+    "--oxfe-color-primary": "#c8102e",
+    "--oxfe-color-primary-contrast": "#ffffff",
+    "--oxfe-color-primary-disabled": "#e8a6af",
+    "--oxfe-color-text": "#2a0f0f",
+    "--oxfe-color-text-muted": "#7a4b4b",
+    "--oxfe-color-border": "#f0c9c4",
+    "--oxfe-color-input-border": "#d9a39c",
+    "--oxfe-color-background": "#fff9f7",
+    "--oxfe-color-surface": "#fde8e6",
+    "--oxfe-color-link": "#a30d25",
+    "--oxfe-color-accent": "#e63946",
+    "--oxfe-color-danger": "#9b0000",
+    "--oxfe-font-family": "'Lato', 'Helvetica Neue', Arial, sans-serif",
+    "--oxfe-font-heading": "'Playfair Display', Georgia, serif"
+  }
+}

@@ -1,0 +1,19 @@
+# HydroXid on localhost — one nginx, three ports, one theme each:
+#   http://localhost:8101  hydroxid-vibrant      http://localhost:8102  hydroxid-dark-ocean
+#   http://localhost:8103  hydroxid-light-red
+# `make local` builds and starts it. The shop's GraphQL is proxied from the SDK shop on the host
+# (http://localhost.local, port 80): start the SDK first (`make up` in the SDK root).
+services:
+  hydroxid:
+    image: nginx:1.27-alpine
+    ports:
+      - '8101:8101'
+      - '8102:8102'
+      - '8103:8103'
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    volumes:
+      - ./dist:/srv/hydroxid/dist:ro
+      - ./build/instances:/srv/hydroxid/build/instances:ro
+      - ./build/nginx-local.conf:/etc/nginx/conf.d/default.conf:ro
+    restart: unless-stopped

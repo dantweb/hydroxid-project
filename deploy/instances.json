@@ -1,0 +1,25 @@
+{
+  "instances": {
+    "vibrant": {
+      "theme": "hydroxid-vibrant",
+      "ports": {
+        "local": 8101,
+        "pay1": 2053
+      }
+    },
+    "dark-ocean": {
+      "theme": "hydroxid-dark-ocean",
+      "ports": {
+        "local": 8102,
+        "pay1": 2083
+      }
+    },
+    "light-red": {
+      "theme": "hydroxid-light-red",
+      "ports": {
+        "local": 8103,
+        "pay1": 8443
+      }
+    }
+  }
+}

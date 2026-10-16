@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Quality gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Read access to the private packages (read-only deploy keys)
+        env:
+          CORE_KEY: ${{ secrets.CORE_DEPLOY_KEY }}
+          USER_KEY: ${{ secrets.USER_DEPLOY_KEY }}
+        run: sh .github/scripts/private-deps.sh
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run type-check
+      - run: npm run knip
+      - run: npm test
+      - run: npm audit
+      - name: Build (themes, app, rendered instance configs, nginx configs)
+        run: npm run build
+      - name: The deployment YAML must not be in the build
+        run: |
+          if find dist build -name '*.yaml' -o -name '*.yml' | grep .; then
+            echo "a YAML file ended up in the build output" >&2; exit 1
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: build
+          path: |
+            dist
+            build
+          retention-days: 7
+
+  e2e:
+    name: E2E (${{ matrix.instance }})
+    needs: check
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        instance: [vibrant, dark-ocean, light-red]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Read access to the private packages (read-only deploy keys)
+        env:
+          CORE_KEY: ${{ secrets.CORE_DEPLOY_KEY }}
+          USER_KEY: ${{ secrets.USER_DEPLOY_KEY }}
+        run: sh .github/scripts/private-deps.sh
+      - run: npm ci
+      - uses: actions/download-artifact@v4
+        with:
+          name: build
+      - run: npx playwright install --with-deps chromium
+      - name: Playwright (shop API mocked)
+        env:
+          INSTANCE: ${{ matrix.instance }}
+        run: npx playwright test --project=chromium
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-${{ matrix.instance }}
+          path: |
+            test-results
+            playwright-report
+          retention-days: 7

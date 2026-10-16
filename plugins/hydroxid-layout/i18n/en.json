@@ -1,0 +1,12 @@
+{
+  "brand": "HydroXid",
+  "tagline": "Hydration, engineered.",
+  "login": "Sign in",
+  "logout": "Sign out",
+  "footer": {
+    "shop": "Shop",
+    "privacy": "Privacy",
+    "cookies": "Cookie settings",
+    "rights": "All rights reserved."
+  }
+}

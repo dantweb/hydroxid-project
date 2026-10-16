@@ -1,0 +1,50 @@
+// HydroXid Vibrant — child of the base `default` theme (oxid-fe-user): re-declare only what differs.
+// Fonts are copied into ../fonts by scripts/copy-fonts.mjs (npm run build:themes).
+@import '../../default/styles/styles.less';
+
+@color-primary: #d6006f;
+@color-primary-contrast: #ffffff;
+@color-primary-disabled: #e9a3c7;
+@color-text: #000000;
+@color-text-muted: #3d3d3d;
+@color-border: #000000;
+@color-input-border: #000000;
+@color-background: #ffffff;
+@color-surface: #fff35c;
+@color-link: #0a2cff;
+@color-accent: #ffd400;
+@color-danger: #d50000;
+
+@font-face {
+  font-family: 'Poppins';
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url('../fonts/poppins-latin-400-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Poppins';
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  src: url('../fonts/poppins-latin-700-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Poppins';
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+  src: url('../fonts/poppins-latin-800-normal.woff2') format('woff2');
+}
+
+:root {
+  --oxfe-font-family: 'Poppins', 'Helvetica Neue', Arial, sans-serif;
+  --oxfe-font-heading: 'Poppins', 'Helvetica Neue', Arial, sans-serif;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--oxfe-font-heading);
+  font-weight: 800;
+}

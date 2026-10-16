@@ -1,0 +1,16 @@
+#!/bin/sh
+# Ships a build to pay1.oxid.dev and activates it. Used by the deploy workflow; runnable by hand:
+#   DEPLOY_HOST=85.236.47.72 DEPLOY_USER=root sh deploy/deploy.sh
+# Expects `npm run build` to have run (dist/, build/instances, build/nginx-pay1.conf).
+set -eu
+
+: "${DEPLOY_HOST:?}" "${DEPLOY_USER:?}"
+BASE="${DEPLOY_PATH:-/var/www/oxid/oxid75/hydroxid-project}"
+RELEASE="$BASE/releases/${GITHUB_SHA:-$(git rev-parse HEAD)}"
+SSH="ssh -o BatchMode=yes ${DEPLOY_SSH_OPTS:-}"
+TARGET="$DEPLOY_USER@$DEPLOY_HOST"
+
+# only what runs: the compiled app, the RENDERED instance configs, the nginx config — never the YAML
+$SSH "$TARGET" "mkdir -p '$RELEASE'"
+tar -czf - dist build/instances build/nginx-pay1.conf | $SSH "$TARGET" "tar -xzf - -C '$RELEASE'"
+$SSH "$TARGET" "sh -s '$RELEASE'" < deploy/remote-activate.sh

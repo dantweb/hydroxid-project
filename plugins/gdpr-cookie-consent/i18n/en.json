@@ -1,0 +1,29 @@
+{
+  "title": "We value your privacy",
+  "summary": "We use cookies to run this shop and, with your consent, to understand how it is used and to personalise it.",
+  "privacyLink": "Privacy policy",
+  "acceptAll": "Accept all",
+  "rejectAll": "Reject all",
+  "customize": "Customize",
+  "customizeTitle": "Cookie settings",
+  "save": "Save my choices",
+  "settings": "Cookie settings",
+  "categories": {
+    "necessary": {
+      "name": "Strictly necessary",
+      "purpose": "Keep the shop working: your session, basket and security. Always on."
+    },
+    "preferences": {
+      "name": "Preferences",
+      "purpose": "Remember choices such as language."
+    },
+    "statistics": {
+      "name": "Statistics",
+      "purpose": "Anonymous measurements that help us improve the shop."
+    },
+    "marketing": {
+      "name": "Marketing",
+      "purpose": "Personalised offers and measuring campaigns."
+    }
+  }
+}

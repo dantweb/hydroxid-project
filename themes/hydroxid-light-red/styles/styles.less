@@ -1,0 +1,57 @@
+// HydroXid Light Red — child of the base `default` theme (oxid-fe-user): re-declare only what differs.
+// Fonts are copied into ../fonts by scripts/copy-fonts.mjs (npm run build:themes).
+@import '../../default/styles/styles.less';
+
+@color-primary: #c8102e;
+@color-primary-contrast: #ffffff;
+@color-primary-disabled: #e8a6af;
+@color-text: #2a0f0f;
+@color-text-muted: #7a4b4b;
+@color-border: #f0c9c4;
+@color-input-border: #d9a39c;
+@color-background: #fff9f7;
+@color-surface: #fde8e6;
+@color-link: #a30d25;
+@color-accent: #e63946;
+@color-danger: #9b0000;
+
+@font-face {
+  font-family: 'Lato';
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url('../fonts/lato-latin-400-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Lato';
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  src: url('../fonts/lato-latin-700-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Playfair Display';
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  src: url('../fonts/playfair-display-latin-700-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Playfair Display';
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+  src: url('../fonts/playfair-display-latin-800-normal.woff2') format('woff2');
+}
+
+:root {
+  --oxfe-font-family: 'Lato', 'Helvetica Neue', Arial, sans-serif;
+  --oxfe-font-heading: 'Playfair Display', Georgia, serif;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--oxfe-font-heading);
+  font-weight: 700;
+}

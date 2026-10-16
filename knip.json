@@ -1,0 +1,10 @@
+{
+  "entry": ["plugins/*/index.ts", "scripts/*.mjs"],
+  "project": ["src/**/*.{ts,vue}", "plugins/**/*.{ts,vue}", "scripts/**/*.mjs"],
+  "ignoreDependencies": [
+    "@fontsource/ibm-plex-sans",
+    "@fontsource/lato",
+    "@fontsource/playfair-display",
+    "@fontsource/poppins"
+  ]
+}

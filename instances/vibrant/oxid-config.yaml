@@ -1,0 +1,41 @@
+# HydroXid instance "vibrant" — theme hydroxid-vibrant.
+# !! This file is NEVER served. The browser gets /oxid-config.json, rendered from it (allow-list;
+# !! secrets refused). Everything under plugins.*.config is PUBLIC. !!
+instance:
+  id: hydroxid-vibrant
+  name: HydroXid
+
+shop:
+  graphql_url: /graphql/
+
+i18n:
+  default_locale: en
+  fallback_locale: en
+  locales: [en, de]
+
+theme:
+  default: default
+  active: hydroxid-vibrant
+
+# order matters: a layout plugin is listed after the plugins whose slots it overrides
+plugins:
+  shop:
+    config:
+      products_per_page: 8
+  checkout: {}
+  payment-stripe:
+    config:
+      mode: redirect # hosted Stripe page: no keys in this repo
+  payment-paypal:
+    config:
+      mode: redirect
+  payment-mollie:
+    config:
+      mode: redirect
+  dashboard: {} # replaced by plugins/dashboard-override (same name)
+  hydroxid-layout: {}
+  gdpr-cookie-consent:
+    config:
+      version: 1
+      privacy_policy_url: /privacy
+      position: center

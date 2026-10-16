@@ -1,0 +1,58 @@
+name: Deploy to pay1.oxid.dev
+
+# MANUAL ONLY: never on push. Starting it is a decision of the project owner.
+# Ships the build to /var/www/oxid/oxid75/hydroxid-project on pay1.oxid.dev:
+#   pay1.oxid.dev:2053  hydroxid-vibrant     pay1.oxid.dev:2083  hydroxid-dark-ocean
+#   pay1.oxid.dev:8443  hydroxid-light-red
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type "deploy" to confirm'
+        required: true
+
+permissions:
+  contents: read
+
+concurrency: deploy-pay1
+
+jobs:
+  deploy:
+    if: ${{ github.event.inputs.confirm == 'deploy' }}
+    runs-on: ubuntu-latest
+    environment: pay1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Read access to the private packages (read-only deploy keys)
+        env:
+          CORE_KEY: ${{ secrets.CORE_DEPLOY_KEY }}
+          USER_KEY: ${{ secrets.USER_DEPLOY_KEY }}
+        run: sh .github/scripts/private-deps.sh
+      - run: npm ci
+      - run: npm run lint && npm run type-check && npm test && npm audit
+      - run: npm run build
+      - name: SSH access to pay1 (pinned host key)
+        env:
+          KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          KNOWN_HOSTS: ${{ vars.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "$KEY" > ~/.ssh/deploy && chmod 600 ~/.ssh/deploy
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+      - name: Ship and activate
+        env:
+          DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ vars.DEPLOY_USER }}
+          DEPLOY_SSH_OPTS: -i ~/.ssh/deploy -o StrictHostKeyChecking=yes
+        run: sh deploy/deploy.sh
+      - name: Smoke test the three ports
+        run: |
+          for port in 2053 2083 8443; do
+            curl -fsS "https://pay1.oxid.dev:$port/oxid-config.json" | grep -q hydroxid
+            code="$(curl -s -o /dev/null -w '%{http_code}' "https://pay1.oxid.dev:$port/oxid-config.yaml")"
+            [ "$code" = 404 ] || { echo "oxid-config.yaml answered $code on $port" >&2; exit 1; }
+          done

@@ -1,0 +1,23 @@
+{
+  "id": "hydroxid-vibrant",
+  "name": "HydroXid Vibrant",
+  "description": "Vibrant, high-contrast: white and black with hot magenta, electric yellow and cobalt — Poppins",
+  "version": "1.0.0",
+  "parent": "default",
+  "tokens": {
+    "--oxfe-color-primary": "#d6006f",
+    "--oxfe-color-primary-contrast": "#ffffff",
+    "--oxfe-color-primary-disabled": "#e9a3c7",
+    "--oxfe-color-text": "#000000",
+    "--oxfe-color-text-muted": "#3d3d3d",
+    "--oxfe-color-border": "#000000",
+    "--oxfe-color-input-border": "#000000",
+    "--oxfe-color-background": "#ffffff",
+    "--oxfe-color-surface": "#fff35c",
+    "--oxfe-color-link": "#0a2cff",
+    "--oxfe-color-accent": "#ffd400",
+    "--oxfe-color-danger": "#d50000",
+    "--oxfe-font-family": "'Poppins', 'Helvetica Neue', Arial, sans-serif",
+    "--oxfe-font-heading": "'Poppins', 'Helvetica Neue', Arial, sans-serif"
+  }
+}
