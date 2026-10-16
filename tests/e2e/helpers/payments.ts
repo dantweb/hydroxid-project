@@ -69,6 +69,12 @@ export async function openPaymentStep(
     await page.getByTestId('save-address').click();
   }
   const method = page.getByTestId(`payment-${PAYMENT_IDS[payment]}`);
+  // several delivery methods (e.g. a cart over €100) have to be chosen; a single one is preselected
+  const delivery = page.locator('input[name=delivery]').first();
+  await expect(method.or(delivery)).toBeVisible({ timeout: 30_000 });
+  if (!(await method.isVisible())) {
+    await delivery.check();
+  }
   await expect(method).toBeVisible({ timeout: 30_000 });
   await method.check();
 }

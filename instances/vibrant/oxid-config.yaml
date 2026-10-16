@@ -9,7 +9,7 @@ shop:
   graphql_url: /graphql/
 
 i18n:
-  default_locale: en
+  default_locale: de
   fallback_locale: en
   locales: [en, de]
 

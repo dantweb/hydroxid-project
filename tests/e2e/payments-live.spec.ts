@@ -17,21 +17,61 @@ import {
  */
 test.skip(!process.env.LIVE || !process.env.E2E_BASE_URL, 'set LIVE=1 and E2E_BASE_URL');
 test.describe.configure({ mode: 'serial' });
+
+/** Stripe can ignore a click that lands while it is still initialising: submit again until the shop's return route opens. */
+async function submitUntilReturn(page: Page, frame: FrameLocator): Promise<void> {
+  await expect(async () => {
+    await frame
+      .locator('[data-testid="hosted-payment-submit-button"]')
+      .first()
+      .click({ timeout: 5_000 })
+      .catch(() => undefined);
+    await page.waitForURL(/\/checkout\/return\/payment-stripe/, { timeout: 12_000 });
+  }).toPass({ timeout: 100_000, intervals: [1_000] });
+}
 test.setTimeout(180_000);
 
 const embedded = (page: Page): FrameLocator =>
   page.frameLocator('iframe[name="embedded-checkout"]');
+
+/** After a decline Stripe also asks for the billing country / postal code: fill them when shown. */
+async function completeBillingDetails(frame: FrameLocator): Promise<void> {
+  const country = frame.getByRole('combobox', { name: 'Country or region' });
+  if (await country.isVisible().catch(() => false)) {
+    await country.selectOption({ label: 'Germany' }).catch(() => undefined);
+  }
+  const postal = frame.getByRole('textbox', { name: /ZIP|Postal code|Postcode/i });
+  if (await postal.isVisible().catch(() => false)) {
+    await postal.fill('79098');
+  }
+}
 
 async function payWithStripeCard(page: Page, card: string): Promise<void> {
   const frame = embedded(page);
   const email = frame.getByRole('textbox', { name: 'Email' });
   await email.waitFor({ state: 'visible', timeout: 60_000 });
   await email.fill(`hydroxid-${Date.now()}@oxid-test.local`);
-  await frame.getByText('Card', { exact: true }).first().click({ force: true });
+  // the account's layout lists methods as "Pay with card" buttons; older layouts use a "Card" label.
+  // Stripe re-renders the list while it loads: click until the card fields are really there.
+  await expect(async () => {
+    const cardOption = frame.getByRole('button', { name: 'Pay with card' });
+    if (await cardOption.isVisible().catch(() => false)) {
+      await cardOption.click({ timeout: 5_000 });
+    } else if (
+      !(await frame
+        .locator('#cardNumber')
+        .isVisible()
+        .catch(() => false))
+    ) {
+      await frame.getByText('Card', { exact: true }).first().click({ force: true, timeout: 5_000 });
+    }
+    await expect(frame.locator('#cardNumber')).toBeVisible({ timeout: 8_000 });
+  }).toPass({ timeout: 60_000 });
   await frame.locator('#cardNumber').fill(card);
   await frame.locator('#cardExpiry').fill(STRIPE.expiry);
   await frame.locator('#cardCvc').fill(STRIPE.cvc);
   await frame.locator('#billingName').fill(STRIPE.name);
+  await completeBillingDetails(frame);
   await frame.locator('[data-testid="hosted-payment-submit-button"]').first().click();
 }
 
@@ -47,6 +87,7 @@ test('Stripe: the form is inline on the checkout page; a test card pays and the 
   await expect(page.getByTestId('pay-now')).toHaveCount(0);
 
   await payWithStripeCard(page, STRIPE.visa);
+  await submitUntilReturn(page, embedded(page));
 
   const orderNumber = await expectCommittedOrder(page, 'payment-stripe');
   await expectOrderInDashboard(page, orderNumber);
@@ -59,18 +100,27 @@ test('Stripe: a declined card is explained inside the form and a good card then 
   await confirmTerms(page);
   await payWithStripeCard(page, STRIPE.declined);
 
-  await expect(
-    embedded(page)
-      .getByText(/card was declined/i)
-      .first(),
-  ).toBeVisible({ timeout: 40_000 });
+  // Stripe can ignore a click that lands while it is still initialising: submit again until it reacts
+  await expect(async () => {
+    await embedded(page)
+      .locator('[data-testid="hosted-payment-submit-button"]')
+      .first()
+      .click({ timeout: 5_000 })
+      .catch(() => undefined);
+    await expect(
+      embedded(page)
+        .getByText(/declined/i)
+        .first(),
+    ).toBeVisible({ timeout: 12_000 });
+  }).toPass({ timeout: 90_000, intervals: [1_000] });
   await expect(page).toHaveURL(/\/checkout$/);
 
   const frame = embedded(page);
   await frame.locator('#cardNumber').fill(STRIPE.visa);
   await frame.locator('#cardExpiry').fill(STRIPE.expiry);
   await frame.locator('#cardCvc').fill(STRIPE.cvc);
-  await frame.locator('[data-testid="hosted-payment-submit-button"]').first().click();
+  await completeBillingDetails(frame);
+  await submitUntilReturn(page, frame);
 
   const orderNumber = await expectCommittedOrder(page, 'payment-stripe');
   await expectOrderInDashboard(page, orderNumber);

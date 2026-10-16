@@ -80,3 +80,22 @@ The frontends call the shop's GraphQL API at `/graphql/` (nginx proxies it to th
 - Backups of the previous files: `composer.json.bak-20261016-graphql`, `composer.lock.bak-20261016-graphql`.
 - Proof: `LIVE=1 E2E_BASE_URL=https://pay1.oxid.dev:2053 npx playwright test live` — catalogue, sign-in,
   account greeting, checkout (all three ports).
+
+### Payments on pay1
+
+pay1's shop offers **Stripe** (test mode, automatic capture) and **Mollie** (test mode, manual capture);
+PayPal's module is not installed there. The instances run both inline (iframe mode) with their
+**public** values only (`publishable_key`, `profile_id`) — no secret ever enters this repository.
+
+Shop-side changes made for this (each with a backup next to the original):
+
+| Change                                                                                                        | Why                                                                                                                                                                                                                    |
+| ------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `oe_payment_base` → `sPaymentBaseHeadlessReturnOrigins` = the three `https://pay1.oxid.dev:<port>` origins    | the shop returns shoppers only to allow-listed frontends                                                                                                                                                               |
+| `oxid-esales/mollie-payment` pinned to `dantweb/mollie-payment` branch `feature/headless-embedded-card-token` | adds `mollieCheckoutStart(cardToken, uiMode: embedded)` for Mollie Components (upstream `b-7.4.x` lacks it); `composer.json.bak-20261016-mollie` restores upstream — inline Mollie then falls back to `mode: redirect` |
+
+Proof: `LIVE=1 E2E_BASE_URL=https://pay1.oxid.dev:2053 npx playwright test payments-live --workers=1`
+(and `:2083`, `:8443`): Stripe test card pays inline, a declined card is explained inside the form and a
+good card then succeeds, Mollie card (Components, authorized), failed Mollie payment → no order and a
+fresh attempt works, iDEAL — each ending in an order visible in `/dashboard/orders`.
+The specs use the shared sandbox test customer; they create real (test-mode) orders in the pay1 shop.
