@@ -40,8 +40,9 @@ served, YAML 404).
 | 2083                  | `hydroxid-dark-ocean` |
 | 8443                  | `hydroxid-light-red`  |
 
-nginx on pay1 listens on these origin ports in plain HTTP (Cloudflare terminates TLS, as it does for
-the shop on 443) and proxies `/graphql/` to the shop's apache on `127.0.0.1:8543`.
+nginx on pay1 listens on these origin ports with TLS (`listen … ssl`, a self-signed certificate in
+`/etc/ssl/hydroxid/`, created by `remote-activate.sh`): Cloudflare reaches custom ports over TLS in
+"Full" mode and answers **525** without it. It proxies `/graphql/` to the shop's apache on `127.0.0.1:8543`.
 
 ### Secrets and variables for the deployment (environment `pay1`)
 

@@ -10,6 +10,15 @@ BASE="$(dirname "$(dirname "$RELEASE")")"   # …/hydroxid-project
 CONF="${NGINX_CONF:-/etc/nginx/conf.d/hydroxid-project.conf}"
 PREVIOUS="$(readlink -f "$BASE/current" 2>/dev/null || true)"
 
+# Cloudflare talks TLS to the custom ports ("Full" mode accepts a self-signed origin certificate)
+CERT_DIR="${CERT_DIR:-/etc/ssl/hydroxid}"
+if [ ! -f "$CERT_DIR/origin.crt" ]; then
+  mkdir -p "$CERT_DIR"
+  openssl req -x509 -nodes -newkey rsa:2048 -days 3650 -keyout "$CERT_DIR/origin.key" \
+    -out "$CERT_DIR/origin.crt" -subj "/CN=pay1.oxid.dev" -addext "subjectAltName=DNS:pay1.oxid.dev" 2>/dev/null
+  chmod 600 "$CERT_DIR/origin.key"
+fi
+
 test -f "$RELEASE/dist/index.html"
 test -f "$RELEASE/build/nginx-pay1.conf"
 

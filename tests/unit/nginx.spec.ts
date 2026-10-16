@@ -14,6 +14,7 @@ describe('renderNginx', () => {
 
     expect(conf).toContain('listen 8101;');
     expect(conf).toContain('listen 8102;');
+    expect(conf).not.toContain('ssl'); // plain HTTP on localhost
     expect(conf).toContain('alias /srv/hydroxid/build/instances/vibrant/oxid-config.json;');
     expect(conf).toContain('alias /srv/hydroxid/build/instances/dark-ocean/oxid-config.json;');
     expect(conf).not.toContain('2053');
@@ -22,8 +23,9 @@ describe('renderNginx', () => {
   it('pay1 uses its own ports, release path and the shop behind it over TLS', () => {
     const conf = renderNginx(targets, 'pay1');
 
-    expect(conf).toContain('listen 2053;');
-    expect(conf).toContain('listen 2083;');
+    expect(conf).toContain('listen 2053 ssl;');
+    expect(conf).toContain('listen 2083 ssl;');
+    expect(conf).toContain('ssl_certificate /etc/ssl/hydroxid/origin.crt;');
     expect(conf).toContain('/var/www/oxid/oxid75/hydroxid-project/current/dist');
     expect(conf).toContain('proxy_pass https://127.0.0.1:8543/graphql/;');
     expect(conf).toContain('proxy_set_header Host pay1.oxid.dev;');

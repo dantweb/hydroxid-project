@@ -37,7 +37,12 @@ function sandbox(nginxOk: boolean) {
   const conf = join(root, 'hydroxid-project.conf');
   const activate = (dir: string) =>
     spawnSync('sh', ['deploy/remote-activate.sh', dir], {
-      env: { ...process.env, PATH: `${bin}:${process.env.PATH}`, NGINX_CONF: conf },
+      env: {
+        ...process.env,
+        PATH: `${bin}:${process.env.PATH}`,
+        NGINX_CONF: conf,
+        CERT_DIR: join(root, 'certs'),
+      },
       encoding: 'utf-8',
     });
   return { root, base, conf, release, activate };
@@ -79,6 +84,17 @@ describe('deploy/remote-activate.sh', () => {
     expect(readlinkSync(join(bad.base, 'current'))).toBe(oldDir);
     expect(readFileSync(bad.conf, 'utf-8')).toBe('conf-old');
     expect(existsSync(join(bad.root, 'systemctl.log'))).toBe(false); // never reloaded
+  });
+
+  it('creates the self-signed origin certificate once (Cloudflare reaches the ports over TLS)', () => {
+    const s = sandbox(true);
+    s.activate(s.release('c1', 'conf'));
+
+    const crt = join(s.root, 'certs', 'origin.crt');
+    expect(existsSync(crt)).toBe(true);
+    const before = readFileSync(crt, 'utf-8');
+    s.activate(s.release('c2', 'conf'));
+    expect(readFileSync(crt, 'utf-8')).toBe(before); // kept, not regenerated
   });
 
   it('refuses a release without the compiled app', () => {

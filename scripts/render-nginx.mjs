@@ -17,6 +17,7 @@ const TARGETS = {
     upstream: 'http://host.docker.internal',
     upstreamHost: 'localhost.local',
     tls: false,
+    originTls: false,
   },
   // pay1.oxid.dev: host nginx; the OXID shop's apache container listens on 127.0.0.1:8543 (TLS)
   pay1: {
@@ -25,6 +26,9 @@ const TARGETS = {
     upstream: 'https://127.0.0.1:8543',
     upstreamHost: 'pay1.oxid.dev',
     tls: true,
+    // Cloudflare reaches the custom ports over TLS ("Full" mode: a self-signed origin certificate is
+    // accepted); without it the visitor sees error 525. deploy/remote-activate.sh creates the certificate.
+    originTls: true,
   },
 };
 
@@ -48,8 +52,12 @@ function serverBlock(name, port, target) {
 `;
   return `# instance "${name}"
 server {
-    listen ${port};
-    server_name ${target.serverName};
+    listen ${port}${target.originTls ? ' ssl' : ''};
+${
+  target.originTls
+    ? '    ssl_certificate /etc/ssl/hydroxid/origin.crt;\n    ssl_certificate_key /etc/ssl/hydroxid/origin.key;\n'
+    : ''
+}    server_name ${target.serverName};
     root ${target.root}/dist;
     index index.html;
 
