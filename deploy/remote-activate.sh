@@ -1,39 +1,37 @@
 #!/bin/sh
-# Runs ON the server (pay1.oxid.dev), called by deploy.sh with the release directory:
+# Runs ON the server as the CI user `github-actions` (never root), called by deploy.sh:
 #   remote-activate.sh /var/www/oxid/oxid75/hydroxid-project/releases/<sha>
-# Switches `current` to the release, installs the nginx config, reloads nginx — and rolls back to the
-# previous release if nginx rejects the new configuration. Keeps the five newest releases.
+# It writes only inside the project folder: switches `current` to the release (nginx includes
+# current/build/nginx-pay1.conf), reloads nginx through its one sudo rule, health-checks every port
+# and ROLLS BACK to the previous release if nginx did not come up with the new configuration.
+# Keeps the five newest releases. Prerequisite: deploy/server-setup.sh (run once, as root).
 set -eu
 
 RELEASE="$1"
 BASE="$(dirname "$(dirname "$RELEASE")")"   # …/hydroxid-project
-CONF="${NGINX_CONF:-/etc/nginx/conf.d/hydroxid-project.conf}"
 PREVIOUS="$(readlink -f "$BASE/current" 2>/dev/null || true)"
-
-# Cloudflare talks TLS to the custom ports ("Full" mode accepts a self-signed origin certificate)
-CERT_DIR="${CERT_DIR:-/etc/ssl/hydroxid}"
-if [ ! -f "$CERT_DIR/origin.crt" ]; then
-  mkdir -p "$CERT_DIR"
-  openssl req -x509 -nodes -newkey rsa:2048 -days 3650 -keyout "$CERT_DIR/origin.key" \
-    -out "$CERT_DIR/origin.crt" -subj "/CN=pay1.oxid.dev" -addext "subjectAltName=DNS:pay1.oxid.dev" 2>/dev/null
-  chmod 600 "$CERT_DIR/origin.key"
-fi
+RELOAD="${NGINX_RELOAD:-sudo -n /usr/sbin/nginx -s reload}"
+CURL="${HEALTH_CURL:-curl -ksf -m 10}"
 
 test -f "$RELEASE/dist/index.html"
 test -f "$RELEASE/build/nginx-pay1.conf"
 
-ln -sfn "$RELEASE" "$BASE/current.next"
-mv -Tf "$BASE/current.next" "$BASE/current"       # atomic switch
-[ -f "$CONF" ] && cp "$CONF" "$CONF.previous"
-cp "$RELEASE/build/nginx-pay1.conf" "$CONF"
+switch() { ln -sfn "$1" "$BASE/current.next" && mv -Tf "$BASE/current.next" "$BASE/current"; }  # atomic
 
-if nginx -t 2>&1; then
-  systemctl reload nginx
+healthy() {
+  for port in $(sed -n 's/^ *listen \([0-9]*\).*/\1/p' "$RELEASE/build/nginx-pay1.conf"); do
+    $CURL "https://127.0.0.1:$port/oxid-config.json" > /dev/null || return 1
+  done
+}
+
+switch "$RELEASE"
+$RELOAD
+sleep 2
+if healthy; then
   echo "activated $(basename "$RELEASE")"
 else
-  echo "nginx rejected the configuration — rolling back" >&2
-  [ -f "$CONF.previous" ] && cp "$CONF.previous" "$CONF" || rm -f "$CONF"
-  [ -n "$PREVIOUS" ] && ln -sfn "$PREVIOUS" "$BASE/current.next" && mv -Tf "$BASE/current.next" "$BASE/current"
+  echo "the new release is not healthy — rolling back" >&2
+  if [ -n "$PREVIOUS" ]; then switch "$PREVIOUS"; $RELOAD; fi
   exit 1
 fi
 

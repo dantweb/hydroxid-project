@@ -1,6 +1,7 @@
 #!/bin/sh
 # Ships a build to pay1.oxid.dev and activates it. Used by the deploy workflow; runnable by hand:
-#   DEPLOY_HOST=85.236.47.72 DEPLOY_USER=root sh deploy/deploy.sh
+#   DEPLOY_HOST=85.236.47.72 DEPLOY_USER=github-actions sh deploy/deploy.sh
+# The user is the CI user: only it writes the project folder (deploy/server-setup.sh, once, as root).
 # Expects `npm run build` to have run (dist/, build/instances, build/nginx-pay1.conf).
 set -eu
 
