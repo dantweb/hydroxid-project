@@ -88,7 +88,7 @@ test('the footer link and the settings button re-open the dialog with the stored
   await page.getByTestId('cookie-reject-all').click();
   await expect(page.getByTestId('cookie-consent')).toHaveCount(0);
 
-  await page.getByTestId('hx-cookie-settings').click(); // footer of hydroxid-layout
+  await page.getByTestId('hx-cookie-settings').click(); // footer of the hydroxid plugin
   await expect(page.getByTestId('cookie-consent')).toBeVisible();
   await page.getByTestId('cookie-customize').click();
   await expect(page.getByTestId('cookie-toggle-statistics')).not.toBeChecked();

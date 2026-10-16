@@ -22,7 +22,8 @@ export default defineConfig({
         command: `npx vite preview --port 4273 --strictPort`,
         url: 'http://localhost:4273',
         env: { INSTANCE: instance },
-        reuseExistingServer: !process.env.CI,
+        // never reuse: a stale preview of another instance would silently answer for this one
+        reuseExistingServer: false,
         timeout: 60_000,
       },
 });

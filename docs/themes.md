@@ -1,8 +1,10 @@
 # Themes
 
-Each theme is a child of the base `default` theme of `oxid-fe-user` (`parent: default`, LESS
-`@import '../../default/styles/styles.less'`), re-declaring colours and type. The build stages the
-base themes and `themes/` together (`stageThemeSources`) before compiling.
+Each theme is a child of the **`peroxid` theme** of `oxid-fe-user` (`parent: peroxid`, LESS
+`@import '../../peroxid/styles/styles.less'`; peroxid is itself a child of `default`), re-declaring
+colours and type. Peroxid's hero photography, radii and container width come along — they belong to the
+`peroxid` plugin the HydroXid plugin extends. The build stages the base themes and `themes/` together
+(`stageThemeSources`) before compiling.
 
 | Theme                 | Look                                                                      | Typeface                                   | Instance / ports (local · pay1) |
 | --------------------- | ------------------------------------------------------------------------- | ------------------------------------------ | ------------------------------- |

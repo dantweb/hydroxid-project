@@ -3,7 +3,7 @@
   "name": "HydroXid Dark Ocean",
   "description": "Deep navy surfaces with aqua accents — IBM Plex Sans",
   "version": "1.0.0",
-  "parent": "default",
+  "parent": "peroxid",
   "tokens": {
     "--oxfe-color-primary": "#22d3ee",
     "--oxfe-color-primary-contrast": "#04202b",

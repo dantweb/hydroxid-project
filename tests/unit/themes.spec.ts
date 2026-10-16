@@ -28,10 +28,17 @@ function contrast(a: string, b: string): number {
 }
 
 describe('the three HydroXid themes', () => {
-  it('are exactly vibrant, dark-ocean and light-red, all children of the base default theme', () => {
+  it('are exactly vibrant, dark-ocean and light-red, all children of the PEROXID theme', () => {
     expect(ids).toEqual(['hydroxid-dark-ocean', 'hydroxid-light-red', 'hydroxid-vibrant']);
     for (const id of ids) {
-      expect(config(id)).toMatchObject({ id, parent: 'default' });
+      expect(config(id)).toMatchObject({ id, parent: 'peroxid' });
+    }
+  });
+
+  it('every theme imports the peroxid LESS (its hero, spacing and radii come along)', () => {
+    for (const id of ids) {
+      const less = readFileSync(join(THEMES_DIR, id, 'styles/styles.less'), 'utf-8');
+      expect(less).toContain("@import '../../peroxid/styles/styles.less';");
     }
   });
 

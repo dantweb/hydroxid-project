@@ -60,6 +60,12 @@ export async function mockShop(page: Page): Promise<void> {
     if (query.includes('savedList')) {
       return route.fulfill(failure('Basket "noticelist" not found for user "u1"'));
     }
+    if (query.includes('action(')) {
+      return route.fulfill(answer({ action: { products: [] } }));
+    }
+    if (query.includes('category(')) {
+      return route.fulfill(answer({ category: { products: [] } }));
+    }
     if (query.includes('products')) {
       return route.fulfill(answer({ products: [], categories: [] }));
     }

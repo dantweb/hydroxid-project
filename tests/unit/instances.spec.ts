@@ -29,7 +29,7 @@ describe('instances', () => {
   });
 
   it.each(['vibrant', 'dark-ocean', 'light-red'])(
-    '%s renders a safe public config running its theme, layout, consent and the overriding dashboard',
+    '%s renders a safe public config running its theme, the hydroxid (peroxid-extending) plugin, consent and the overriding dashboard',
     (name) => {
       const config = JSON.parse(renderPublicConfig(yamlOf(name)));
       expect(config.theme.active).toBe(targets.instances[name].theme);
@@ -39,12 +39,12 @@ describe('instances', () => {
           'shop',
           'checkout',
           'dashboard',
-          'hydroxid-layout',
+          'hydroxid',
           'gdpr-cookie-consent',
         ]),
       );
-      // the layout plugin is listed after the plugins whose slots it overrides
-      expect(plugins.indexOf('hydroxid-layout')).toBeGreaterThan(plugins.indexOf('shop'));
+      // the extending plugin is listed after the plugins whose slots it overrides
+      expect(plugins.indexOf('hydroxid')).toBeGreaterThan(plugins.indexOf('shop'));
       // no keys in the repo: hosted payment pages
       expect(config.plugins['payment-stripe'].config.mode).toBe('redirect');
     },

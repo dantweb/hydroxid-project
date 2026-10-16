@@ -1,7 +1,7 @@
 # GDPR cookie consent (`plugins/gdpr-cookie-consent`)
 
 A **standalone** plugin: it renders through the host's `overlays` seam and knows nothing about the
-layout (the footer link in `hydroxid-layout` talks to it only through a window event). The model
+layout (the footer link in the `hydroxid` plugin talks to it only through a window event). The model
 follows the CMS plugin of the VBWD platform (`vbwd-fe-user-plugin-cms`): policy primitives, a
 shared composable, a Consent Mode bridge and a two-layer dialog.
 

@@ -33,7 +33,7 @@ plugins:
     config:
       mode: redirect
   dashboard: {} # replaced by plugins/dashboard-override (same name)
-  hydroxid-layout: {}
+  hydroxid: {} # extends the peroxid layout plugin (header, front page, search) — needs `shop`
   gdpr-cookie-consent:
     config:
       version: 1

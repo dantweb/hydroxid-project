@@ -2,7 +2,8 @@ import { PluginRegistry } from '@dantweb/oxid-fe-core';
 import { describe, expect, it } from 'vitest';
 import consent from '../../plugins/gdpr-cookie-consent';
 import dashboardOverride from '../../plugins/dashboard-override';
-import layout from '../../plugins/hydroxid-layout';
+import hydroxid from '../../plugins/hydroxid';
+import peroxid from '@dantweb/oxid-fe-user/plugins/peroxid';
 import base from '@dantweb/oxid-fe-user/plugins/dashboard';
 
 describe('dashboard-override (replaces the bundled plugin by name)', () => {
@@ -53,8 +54,44 @@ describe('gdpr-cookie-consent plugin', () => {
   });
 });
 
-describe('hydroxid-layout plugin', () => {
-  it('takes over header and footer through the host seam, and only those', () => {
-    expect(Object.keys(layout.overrides ?? {}).sort()).toEqual(['footer', 'header']);
+describe('hydroxid plugin (EXTENDS the peroxid layout plugin)', () => {
+  it('keeps everything of peroxid: header, front page, search route, setup, requirements', () => {
+    expect(hydroxid.overrides?.header).toBe(peroxid.overrides?.header);
+    expect(hydroxid.overrides?.home).toBe(peroxid.overrides?.home);
+    expect(hydroxid.routes).toBe(peroxid.routes);
+    expect(hydroxid.setup).toBe(peroxid.setup);
+    expect(hydroxid.requires).toEqual(peroxid.requires);
+    expect(hydroxid.defaultConfig).toBe(peroxid.defaultConfig);
+  });
+
+  it('keeps peroxid’s plugin name, so the peroxid.* message namespace keeps working', () => {
+    expect(hydroxid.name).toBe('peroxid');
+    expect(hydroxid.version).toContain('+hydroxid');
+  });
+
+  it('replaces only the footer slot', () => {
+    expect(hydroxid.overrides?.footer).not.toBe(peroxid.overrides?.footer);
+    expect(Object.keys(hydroxid.overrides ?? {}).sort()).toEqual(
+      Object.keys(peroxid.overrides ?? {}).sort(),
+    );
+  });
+
+  it('lays HydroXid’s copy over peroxid’s messages and leaves the rest intact', () => {
+    const en = hydroxid.messages?.en as Record<string, Record<string, string>>;
+    const original = peroxid.messages?.en as Record<string, Record<string, string>>;
+
+    expect(en.hero.title).toBe('Hydration, engineered.');
+    expect(en.hero.title).not.toBe(original.hero.title);
+    expect(en.footer.cookies).toBe('Cookie settings');
+    // untouched groups and keys are peroxid's own
+    expect(en.search).toEqual(original.search);
+    expect(en.hero.secondary).toBe(original.hero.secondary);
+    expect((hydroxid.messages?.de as Record<string, Record<string, string>>).hero.title).toBe(
+      'Hydration, konstruiert.',
+    );
+  });
+
+  it('brings its own default theme', () => {
+    expect(hydroxid.defaultTheme).toBe('hydroxid-vibrant');
   });
 });

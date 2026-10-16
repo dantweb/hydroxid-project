@@ -3,7 +3,7 @@
   "name": "HydroXid Vibrant",
   "description": "Vibrant, high-contrast: white and black with hot magenta, electric yellow and cobalt — Poppins",
   "version": "1.0.0",
-  "parent": "default",
+  "parent": "peroxid",
   "tokens": {
     "--oxfe-color-primary": "#d6006f",
     "--oxfe-color-primary-contrast": "#ffffff",

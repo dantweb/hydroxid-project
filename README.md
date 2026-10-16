@@ -10,15 +10,15 @@ oxid-fe-user   the storefront application (shop, checkout, payments, dashboard, 
 hydroxid-project   ← this repository: depends on oxid-fe-user, adds its own plugins, themes, instances
 ```
 
-| What                      | Where                                                                                                                |
-| ------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| App shell                 | `src/main.ts` — `startStorefront({ plugins })` from `@dantweb/oxid-fe-user/bootstrap`                                |
-| Plugin that **overrides** | `plugins/dashboard-override` — same name as the bundled `dashboard`, so it replaces it (extends the original)        |
-| Layout plugin             | `plugins/hydroxid-layout` — HydroXid header and footer through the host's layout seam                                |
-| **GDPR cookie consent**   | `plugins/gdpr-cookie-consent` — a standalone plugin (dialog, categories, Consent Mode v2, re-open link)              |
-| Themes (own fonts)        | `themes/hydroxid-vibrant` (Poppins) · `hydroxid-dark-ocean` (IBM Plex Sans) · `hydroxid-light-red` (Playfair + Lato) |
-| Instances (one per theme) | `instances/<name>/oxid-config.yaml` — **server-side only, never served**                                             |
-| Ports                     | `deploy/instances.json`                                                                                              |
+| What                      | Where                                                                                                                                              |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| App shell                 | `src/main.ts` — `startStorefront({ plugins })` from `@dantweb/oxid-fe-user/bootstrap`                                                              |
+| Plugin that **overrides** | `plugins/dashboard-override` — same name as the bundled `dashboard`, so it replaces it (extends the original)                                      |
+| **Extends peroxid**       | `plugins/hydroxid` — the `peroxid` layout plugin of oxid-fe-user (header, search, front page) plus HydroXid's footer and copy                      |
+| **GDPR cookie consent**   | `plugins/gdpr-cookie-consent` — a standalone plugin (dialog, categories, Consent Mode v2, re-open link)                                            |
+| Themes (own fonts)        | children of the **`peroxid` theme**: `hydroxid-vibrant` (Poppins) · `hydroxid-dark-ocean` (IBM Plex Sans) · `hydroxid-light-red` (Playfair + Lato) |
+| Instances (one per theme) | `instances/<name>/oxid-config.yaml` — **server-side only, never served**                                                                           |
+| Ports                     | `deploy/instances.json`                                                                                                                            |
 
 ## Run it on localhost
 

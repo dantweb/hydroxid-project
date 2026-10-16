@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { mockShop, signInAsAda } from './helpers/mockShop';
 
-/** The project layer: its layout plugin, its overriding dashboard plugin, and the instance's theme. */
+/** The project layer: its peroxid-extending plugin, its overriding dashboard plugin, and the instance's theme. */
 const instance = process.env.INSTANCE ?? 'vibrant';
 const EXPECTED = {
   vibrant: {
@@ -62,19 +62,27 @@ test(`the ${instance} instance runs its theme with its own typeface`, async ({ p
   expect(loaded).toBe(true);
 });
 
-test('the HydroXid layout plugin supplies header and footer', async ({ page }) => {
+test('the hydroxid plugin extends peroxid: its header and front page, HydroXid’s footer and copy', async ({
+  page,
+}) => {
   await page.goto('/');
-  await expect(page.getByTestId('hx-header')).toBeVisible();
-  await expect(page.getByTestId('hx-brand')).toHaveText(/HydroXid/);
+  await expect(page.getByTestId('pxd-header')).toBeVisible(); // peroxid's own header
+  await expect(page.getByTestId('pxd-brand')).toHaveText(/HydroXid/);
+  await expect(page.getByTestId('pxd-hero')).toBeVisible(); // peroxid's front page …
+  await expect(page.getByTestId('pxd-hero')).toContainText('Hydration, engineered.'); // … with HydroXid's copy
   await expect(page.getByTestId('hx-footer')).toBeVisible();
+  await expect(page.getByTestId('pxd-footer')).toBeVisible(); // peroxid's footer inside ours
   await expect(page.locator('.header__brand')).toHaveCount(0); // the stock header is gone
 });
 
 test('primary buttons take the theme colour (shared button styles of oxid-fe-core)', async ({
   page,
 }) => {
-  await page.goto('/');
-  await expect(page.getByTestId('hx-login')).toHaveCSS('background-color', EXPECTED.primary);
+  await page.goto('/login');
+  await expect(page.locator('[data-testid="login-form"] button[type=submit]')).toHaveCSS(
+    'background-color',
+    EXPECTED.primary,
+  );
 });
 
 test('the dashboard plugin of oxid-fe-user is REPLACED by the project’s (greeting copy)', async ({

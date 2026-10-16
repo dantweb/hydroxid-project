@@ -9,7 +9,7 @@ add() { # alias repo key
   printf '%s\n' "$3" > ~/.ssh/"$1" && chmod 600 ~/.ssh/"$1"
   printf 'Host github.com-%s\n  HostName github.com\n  User git\n  IdentityFile ~/.ssh/%s\n  IdentitiesOnly yes\n' "$1" "$1" >> ~/.ssh/config
   for from in "ssh://git@github.com/dantweb/$2" "ssh://git@github.com/dantweb/$2.git" "git@github.com:dantweb/$2" "git@github.com:dantweb/$2.git" "https://github.com/dantweb/$2" "https://github.com/dantweb/$2.git"; do
-    git config --global url."git@github.com-$1:dantweb/$2.git".insteadOf "$from"
+    git config --global --add url."git@github.com-$1:dantweb/$2.git".insteadOf "$from"
   done
 }
 

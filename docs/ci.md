@@ -6,7 +6,7 @@
    package with a known advisory) · build (themes → app → rendered instance configs → nginx configs)
    · a check that **no YAML is in the build output**.
 2. **E2E matrix** over the three instances (Playwright, `vite preview`, shop API mocked): consent
-   dialog, layout plugin, overriding dashboard, the instance's theme and webfont.
+   dialog, the peroxid-extending plugin, overriding dashboard, the instance's theme and webfont.
 
 ### Secrets for CI
 

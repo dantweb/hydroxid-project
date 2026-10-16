@@ -1,7 +1,7 @@
 {
   "name": "hydroxid-project",
   "version": "0.1.0",
-  "description": "HydroXid \u2014 a client storefront built on @dantweb/oxid-fe-user: own plugins, own themes, GDPR cookie consent.",
+  "description": "HydroXid — a client storefront built on @dantweb/oxid-fe-user: own plugins, own themes, GDPR cookie consent.",
   "private": true,
   "type": "module",
   "scripts": {
@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "@dantweb/oxid-fe-core": "github:dantweb/oxid-fe-core#v0.8.1",
-    "@dantweb/oxid-fe-user": "github:dantweb/oxid-fe-user#v0.3.1",
+    "@dantweb/oxid-fe-user": "github:dantweb/oxid-fe-user#v0.3.3",
     "pinia": "^3.0.1",
     "vue": "^3.5.13",
     "vue-i18n": "^11.1.0",
