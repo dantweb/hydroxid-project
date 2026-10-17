@@ -3,6 +3,10 @@ import { describe, expect, it } from 'vitest';
 import consent from '../../plugins/gdpr-cookie-consent';
 import dashboardOverride from '../../plugins/dashboard-override';
 import hydroxid from '../../plugins/hydroxid';
+import hydroxidDe from '../../plugins/hydroxid/i18n/de.json';
+import hydroxidEn from '../../plugins/hydroxid/i18n/en.json';
+import greetingDe from '../../plugins/dashboard-override/i18n/de.json';
+import greetingEn from '../../plugins/dashboard-override/i18n/en.json';
 import peroxid from '@dantweb/oxid-fe-user/plugins/peroxid';
 import base from '@dantweb/oxid-fe-user/plugins/dashboard';
 
@@ -15,8 +19,10 @@ describe('dashboard-override (replaces the bundled plugin by name)', () => {
   });
 
   it('changes only what HydroXid wants: the greeting copy, per locale', () => {
-    expect(dashboardOverride.messages?.en.hello).toBe('Welcome back');
-    expect(dashboardOverride.messages?.de.hello).toBe('Willkommen zurück');
+    // the wording lives in i18n/*.json — tests never pin it, so a copy change cannot break CI
+    expect(dashboardOverride.messages?.en.hello).toBe(greetingEn.hello);
+    expect(dashboardOverride.messages?.de.hello).toBe(greetingDe.hello);
+    expect(greetingEn.hello).not.toBe(base.messages?.en.hello);
     // untouched keys are the original's
     expect(dashboardOverride.messages?.en.menu).toEqual(base.messages?.en.menu);
   });
@@ -76,19 +82,18 @@ describe('hydroxid plugin (EXTENDS the peroxid layout plugin)', () => {
     );
   });
 
-  it('lays HydroXid’s copy over peroxid’s messages and leaves the rest intact', () => {
+  it('lays HydroXid’s copy (the i18n JSON files) over peroxid’s messages and leaves the rest intact', () => {
     const en = hydroxid.messages?.en as Record<string, Record<string, string>>;
+    const de = hydroxid.messages?.de as Record<string, Record<string, string>>;
     const original = peroxid.messages?.en as Record<string, Record<string, string>>;
 
-    expect(en.hero.title).toBe('Hydration, engineered.');
-    expect(en.hero.title).not.toBe(original.hero.title);
-    expect(en.footer.cookies).toBe('Cookie settings');
+    expect(en.hero).toMatchObject(hydroxidEn.hero);
+    expect(de.hero).toMatchObject(hydroxidDe.hero);
+    expect(en.footer).toMatchObject(hydroxidEn.footer);
+    expect(en.hero.title).not.toBe(original.hero.title); // the copy really replaces peroxid's
     // untouched groups and keys are peroxid's own
     expect(en.search).toEqual(original.search);
     expect(en.hero.secondary).toBe(original.hero.secondary);
-    expect((hydroxid.messages?.de as Record<string, Record<string, string>>).hero.title).toBe(
-      'Hydration, konstruiert.',
-    );
   });
 
   it('brings its own default theme', () => {

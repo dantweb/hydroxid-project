@@ -1,11 +1,13 @@
 import { expect, test } from '@playwright/test';
+import { greetingCopy, hydroxidCopy } from './helpers/copy';
 import { mockShop, signInAsAda } from './helpers/mockShop';
 
 /** The project layer: its peroxid-extending plugin, its overriding dashboard plugin, and the instance's theme. */
 const instance = process.env.INSTANCE ?? 'vibrant';
+// the expected wording is READ from the localisation files: editing a translation must not break CI
 const COPY = {
-  en: { hero: 'Hydration, engineered.', greeting: 'Welcome back Ada' },
-  de: { hero: 'Hydration, konstruiert.', greeting: 'Willkommen zurück Ada' },
+  en: { hero: hydroxidCopy.en.hero.title, greeting: `${greetingCopy.en.hello} Ada` },
+  de: { hero: hydroxidCopy.de.hero.title, greeting: `${greetingCopy.de.hello} Ada` },
 } as const;
 const EXPECTED = {
   vibrant: {

@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { greetingCopy } from './helpers/copy';
 
 /**
  * Against a REAL shop (not part of CI — it needs the shop's GraphQL):
@@ -65,9 +66,12 @@ test('the account shows HydroXid’s greeting (the overriding dashboard plugin) 
   await signIn(page);
   await page.goto('/dashboard');
 
-  await expect(page.getByTestId('account-hello')).toContainText(/Welcome back|Willkommen zurück/, {
-    timeout: 30_000,
-  });
+  await expect(page.getByTestId('account-hello')).toContainText(
+    new RegExp(`${greetingCopy.en.hello}|${greetingCopy.de.hello}`),
+    {
+      timeout: 30_000,
+    },
+  );
   await expect(page.getByTestId('account-email')).toHaveText(USER.email);
   await expect(page.getByTestId('card-orders')).toBeVisible();
 });

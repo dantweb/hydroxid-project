@@ -1,12 +1,15 @@
 import type { IPlugin } from '@dantweb/oxid-fe-core';
 import base from '@dantweb/oxid-fe-user/plugins/dashboard';
+import de from './i18n/de.json';
+import en from './i18n/en.json';
 
 /**
  * Overrides oxid-fe-user's `dashboard` plugin BY NAME (src/main.ts registers it as `dashboard`):
  * everything of the original stays — routes, views, setup — and HydroXid changes what it wants to.
- * Here: the greeting copy. Replace a route's component the same way (`routes.map(...)`).
+ * Here: the greeting copy (i18n/en.json, i18n/de.json). Replace a route's component the same way
+ * (`routes.map(...)`).
  */
-const GREETING = { en: 'Welcome back', de: 'Willkommen zurück' } as const;
+const COPY: Record<string, Record<string, string>> = { en, de };
 
 const plugin: IPlugin = {
   ...base,
@@ -14,9 +17,7 @@ const plugin: IPlugin = {
   messages: Object.fromEntries(
     Object.entries(base.messages ?? {}).map(([locale, messages]) => [
       locale,
-      locale in GREETING
-        ? { ...messages, hello: GREETING[locale as keyof typeof GREETING] }
-        : messages,
+      { ...messages, ...COPY[locale] },
     ]),
   ),
 };
