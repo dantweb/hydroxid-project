@@ -74,11 +74,9 @@ test(`the checkout interface speaks ${lang} (and not the other language)`, async
   );
 });
 
-// KNOWN GAP (backend, not the storefront): Stripe's Embedded Checkout takes its language from the
-// Checkout Session's `locale`, which the stripe-wallet module does not set — so Stripe falls back to
-// the BROWSER's language. Fix: set `locale` from the request language when the module creates the
-// session. Remove `fixme` when that is in.
-test.fixme(`Stripe's form speaks ${lang}`, async ({ page }) => {
+// Stripe's Embedded Checkout takes its language from the Checkout Session's `locale`; the stripe-wallet
+// module sets it from the shop's active language (the storefront sends its own via Accept-Language).
+test(`Stripe's form speaks ${lang}`, async ({ page }) => {
   test.setTimeout(120_000);
   await openPaymentStep(page, 'stripe');
   await confirmTerms(page);

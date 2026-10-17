@@ -36,11 +36,11 @@ const embedded = (page: Page): FrameLocator =>
 
 /** After a decline Stripe also asks for the billing country / postal code: fill them when shown. */
 async function completeBillingDetails(frame: FrameLocator): Promise<void> {
-  const country = frame.getByRole('combobox', { name: 'Country or region' });
+  const country = frame.getByRole('combobox', { name: /Country or region|Land oder Region/ });
   if (await country.isVisible().catch(() => false)) {
-    await country.selectOption({ label: 'Germany' }).catch(() => undefined);
+    await country.selectOption('DE').catch(() => undefined);
   }
-  const postal = frame.getByRole('textbox', { name: /ZIP|Postal code|Postcode/i });
+  const postal = frame.getByRole('textbox', { name: /ZIP|Postal code|Postcode|PLZ|Postleitzahl/i });
   if (await postal.isVisible().catch(() => false)) {
     await postal.fill('79098');
   }
@@ -48,13 +48,13 @@ async function completeBillingDetails(frame: FrameLocator): Promise<void> {
 
 async function payWithStripeCard(page: Page, card: string): Promise<void> {
   const frame = embedded(page);
-  const email = frame.getByRole('textbox', { name: 'Email' });
+  const email = frame.getByRole('textbox', { name: /^(Email|E-Mail)/ });
   await email.waitFor({ state: 'visible', timeout: 60_000 });
   await email.fill(`hydroxid-${Date.now()}@oxid-test.local`);
   // the account's layout lists methods as "Pay with card" buttons; older layouts use a "Card" label.
   // Stripe re-renders the list while it loads: click until the card fields are really there.
   await expect(async () => {
-    const cardOption = frame.getByRole('button', { name: 'Pay with card' });
+    const cardOption = frame.locator('[data-testid="card-accordion-item-button"]');
     if (await cardOption.isVisible().catch(() => false)) {
       await cardOption.click({ timeout: 5_000 });
     } else if (
@@ -63,7 +63,10 @@ async function payWithStripeCard(page: Page, card: string): Promise<void> {
         .isVisible()
         .catch(() => false))
     ) {
-      await frame.getByText('Card', { exact: true }).first().click({ force: true, timeout: 5_000 });
+      await frame
+        .getByText(/^(Card|Karte)$/)
+        .first()
+        .click({ force: true, timeout: 5_000 });
     }
     await expect(frame.locator('#cardNumber')).toBeVisible({ timeout: 8_000 });
   }).toPass({ timeout: 60_000 });
@@ -109,7 +112,7 @@ test('Stripe: a declined card is explained inside the form and a good card then 
       .catch(() => undefined);
     await expect(
       embedded(page)
-        .getByText(/declined/i)
+        .getByText(/declined|abgelehnt/i)
         .first(),
     ).toBeVisible({ timeout: 12_000 });
   }).toPass({ timeout: 90_000, intervals: [1_000] });
