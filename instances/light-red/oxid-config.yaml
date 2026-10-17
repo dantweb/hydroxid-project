@@ -9,9 +9,10 @@ shop:
   graphql_url: /graphql/
 
 i18n:
+  # one language per instance: the browser's language does not override it
   default_locale: de
-  fallback_locale: en
-  locales: [en, de]
+  fallback_locale: de
+  locales: [de]
 
 theme:
   default: default
@@ -34,7 +35,7 @@ plugins:
       mode: iframe
       profile_id: pfl_cVf8bSWdQV
       test_mode: true
-      locale: en_US
+      locale: de_DE
       methods: [creditcard, ideal, bancontact]
   dashboard: {} # replaced by plugins/dashboard-override (same name)
   hydroxid: {} # extends the peroxid layout plugin (header, front page, search) — needs `shop`
@@ -43,3 +44,8 @@ plugins:
       version: 1
       privacy_policy_url: /privacy
       position: center
+  # keeps devices on the latest release: an open page notices a new deploy and reloads (not in the checkout)
+  release-watcher:
+    config:
+      interval_seconds: 30
+      auto_reload: true

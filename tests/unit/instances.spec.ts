@@ -28,6 +28,26 @@ describe('instances', () => {
     }
   });
 
+  it('two instances are German and one is English — one language each, so the browser cannot override it', () => {
+    const locales = Object.fromEntries(
+      ['vibrant', 'dark-ocean', 'light-red'].map((name) => {
+        const i18n = JSON.parse(renderPublicConfig(yamlOf(name))).i18n;
+        return [name, i18n];
+      }),
+    );
+
+    expect(locales.vibrant).toMatchObject({ default_locale: 'en', locales: ['en'] });
+    expect(locales['dark-ocean']).toMatchObject({ default_locale: 'de', locales: ['de'] });
+    expect(locales['light-red']).toMatchObject({ default_locale: 'de', locales: ['de'] });
+  });
+
+  it('every instance keeps devices on the latest release', () => {
+    for (const name of ['vibrant', 'dark-ocean', 'light-red']) {
+      const config = JSON.parse(renderPublicConfig(yamlOf(name)));
+      expect(config.plugins['release-watcher'].config).toMatchObject({ auto_reload: true });
+    }
+  });
+
   it.each(['vibrant', 'dark-ocean', 'light-red'])(
     '%s renders a safe public config running its theme, the hydroxid (peroxid-extending) plugin, consent and the overriding dashboard',
     (name) => {

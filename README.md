@@ -54,5 +54,7 @@ matrix over the three instances. **Deployment** is a separate, manual workflow
 looks like a secret (`@dantweb/oxid-fe-user`, `docs/instance-configuration.md`). Everything under
 `plugins.*.config` is public — keep keys out of it. The build also fails if a YAML ends up in `dist/`.
 
+Conference demo — change a translation, deploy, the open page updates itself: [docs/demo-localisation.md](docs/demo-localisation.md)
+
 More: [docs/architecture.md](docs/architecture.md) · [docs/gdpr-cookie-consent.md](docs/gdpr-cookie-consent.md) ·
 [docs/themes.md](docs/themes.md) · [docs/ci.md](docs/ci.md)

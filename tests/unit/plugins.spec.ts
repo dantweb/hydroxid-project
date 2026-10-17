@@ -95,3 +95,18 @@ describe('hydroxid plugin (EXTENDS the peroxid layout plugin)', () => {
     expect(hydroxid.defaultTheme).toBe('hydroxid-vibrant');
   });
 });
+
+describe('the localisation of the hydroxid plugin lives in plain JSON files', () => {
+  it('every key exists in both languages (a translation cannot be forgotten)', async () => {
+    const en = (await import('../../plugins/hydroxid/i18n/en.json')).default;
+    const de = (await import('../../plugins/hydroxid/i18n/de.json')).default;
+    const keys = (o: Record<string, unknown>, prefix = ''): string[] =>
+      Object.entries(o).flatMap(([k, v]) =>
+        typeof v === 'object' && v
+          ? keys(v as Record<string, unknown>, `${prefix}${k}.`)
+          : [`${prefix}${k}`],
+      );
+
+    expect(keys(de).sort()).toEqual(keys(en).sort());
+  });
+});

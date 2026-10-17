@@ -61,6 +61,16 @@ export default defineConfig(({ mode }) => {
     },
     test: {
       environment: 'happy-dom',
+      // unit tests never load scripts or styles from a URL
+      environmentOptions: {
+        happyDOM: {
+          settings: {
+            disableJavaScriptFileLoading: true,
+            disableCSSFileLoading: true,
+            handleDisabledFileLoadingAsSuccess: true,
+          },
+        },
+      },
       include: ['tests/unit/**/*.spec.ts'],
       exclude: [...configDefaults.exclude, 'tests/e2e/**'],
     },

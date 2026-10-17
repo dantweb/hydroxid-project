@@ -3,20 +3,27 @@ import { mockShop, signInAsAda } from './helpers/mockShop';
 
 /** The project layer: its peroxid-extending plugin, its overriding dashboard plugin, and the instance's theme. */
 const instance = process.env.INSTANCE ?? 'vibrant';
+const COPY = {
+  en: { hero: 'Hydration, engineered.', greeting: 'Welcome back Ada' },
+  de: { hero: 'Hydration, konstruiert.', greeting: 'Willkommen zurück Ada' },
+} as const;
 const EXPECTED = {
   vibrant: {
+    lang: 'en' as const,
     theme: 'hydroxid-vibrant',
     font: 'Poppins',
     primary: 'rgb(214, 0, 111)',
     bg: 'rgb(255, 255, 255)',
   },
   'dark-ocean': {
+    lang: 'de' as const,
     theme: 'hydroxid-dark-ocean',
     font: 'IBM Plex Sans',
     primary: 'rgb(34, 211, 238)',
     bg: 'rgb(6, 20, 31)',
   },
   'light-red': {
+    lang: 'de' as const,
     theme: 'hydroxid-light-red',
     font: 'Lato',
     primary: 'rgb(200, 16, 46)',
@@ -69,7 +76,7 @@ test('the hydroxid plugin extends peroxid: its header and front page, HydroXid�
   await expect(page.getByTestId('pxd-header')).toBeVisible(); // peroxid's own header
   await expect(page.getByTestId('pxd-brand')).toHaveText(/HydroXid/);
   await expect(page.getByTestId('pxd-hero')).toBeVisible(); // peroxid's front page …
-  await expect(page.getByTestId('pxd-hero')).toContainText('Hydration, engineered.'); // … with HydroXid's copy
+  await expect(page.getByTestId('pxd-hero')).toContainText(COPY[EXPECTED.lang].hero); // … with HydroXid's copy
   await expect(page.getByTestId('hx-footer')).toBeVisible();
   await expect(page.getByTestId('pxd-footer')).toBeVisible(); // peroxid's footer inside ours
   await expect(page.locator('.header__brand')).toHaveCount(0); // the stock header is gone
@@ -91,6 +98,31 @@ test('the dashboard plugin of oxid-fe-user is REPLACED by the project’s (greet
   await signInAsAda(page);
   await page.goto('/dashboard');
 
-  await expect(page.getByTestId('account-hello')).toHaveText('Welcome back Ada'); // stock: "Hello Ada"
+  await expect(page.getByTestId('account-hello')).toHaveText(COPY[EXPECTED.lang].greeting); // stock: "Hello Ada"
   await expect(page.getByTestId('card-orders')).toBeVisible(); // the rest of the original still works
+});
+
+test('the instance speaks ONE language: <html lang>, the hero copy, and a browser in another language does not change it', async ({
+  browser,
+}) => {
+  const other = EXPECTED.lang === 'en' ? 'de-DE' : 'en-GB';
+  const context = await browser.newContext({ locale: other });
+  const page = await context.newPage();
+  await mockShop(page);
+  await page.addInitScript(() => {
+    localStorage.setItem(
+      'hydroxid_cookie_consent',
+      JSON.stringify({
+        version: 1,
+        decidedAt: 'x',
+        method: 'reject_all',
+        categories: { necessary: true, preferences: false, statistics: false, marketing: false },
+      }),
+    );
+  });
+  await page.goto('/');
+
+  await expect(page.getByTestId('pxd-hero')).toContainText(COPY[EXPECTED.lang].hero);
+  await expect(page.locator('html')).toHaveAttribute('lang', EXPECTED.lang);
+  await context.close();
 });

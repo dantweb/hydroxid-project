@@ -1,5 +1,7 @@
 import type { IPlugin } from '@dantweb/oxid-fe-core';
 import peroxid from '@dantweb/oxid-fe-user/plugins/peroxid';
+import de from './i18n/de.json';
+import en from './i18n/en.json';
 
 /**
  * HydroXid's plugin EXTENDS oxid-fe-user's `peroxid` layout plugin: everything of peroxid — header
@@ -13,30 +15,8 @@ import peroxid from '@dantweb/oxid-fe-user/plugins/peroxid';
  * `peroxid.*` message namespace and the registry keys messages by plugin name. In
  * `oxid-config.yaml` it is listed as `hydroxid` (the loader key chosen in src/main.ts).
  */
-const COPY = {
-  en: {
-    hero: {
-      eyebrow: 'The HydroXid edit',
-      title: 'Hydration, engineered.',
-      lead: 'Bottles, filters and gear for people who take every sip seriously — chosen for the details.',
-      cta: 'Discover the collection',
-    },
-    footer: { rights: 'All rights reserved.', privacy: 'Privacy', cookies: 'Cookie settings' },
-  },
-  de: {
-    hero: {
-      eyebrow: 'Die HydroXid-Auswahl',
-      title: 'Hydration, konstruiert.',
-      lead: 'Flaschen, Filter und Ausrüstung für alle, die jeden Schluck ernst nehmen — ausgewählt bis ins Detail.',
-      cta: 'Kollektion entdecken',
-    },
-    footer: {
-      rights: 'Alle Rechte vorbehalten.',
-      privacy: 'Datenschutz',
-      cookies: 'Cookie-Einstellungen',
-    },
-  },
-} as const;
+/** HydroXid's copy per language — plain JSON, the file to edit for a wording change (i18n/en.json, i18n/de.json). */
+const COPY = { en, de } as const;
 
 type Messages = Record<string, Record<string, unknown>>;
 
