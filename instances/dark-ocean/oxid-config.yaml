@@ -35,7 +35,6 @@ plugins:
       mode: iframe
       profile_id: pfl_cVf8bSWdQV
       test_mode: true
-      locale: de_DE
       methods: [creditcard, ideal, bancontact]
   dashboard: {} # replaced by plugins/dashboard-override (same name)
   hydroxid: {} # extends the peroxid layout plugin (header, front page, search) — needs `shop`

@@ -122,9 +122,17 @@ test('the instance speaks ONE language: <html lang>, the hero copy, and a browse
       }),
     );
   });
+  const asked: string[] = [];
+  page.on('request', (request) => {
+    if (request.url().includes('/graphql'))
+      asked.push(request.headers()['accept-language'] ?? '(none)');
+  });
   await page.goto('/');
 
   await expect(page.getByTestId('pxd-hero')).toContainText(COPY[EXPECTED.lang].hero);
   await expect(page.locator('html')).toHaveAttribute('lang', EXPECTED.lang);
+  // and the SHOP is asked in the instance's language, so its product data comes in that language too
+  expect(asked.length).toBeGreaterThan(0);
+  expect(new Set(asked)).toEqual(new Set([EXPECTED.lang]));
   await context.close();
 });

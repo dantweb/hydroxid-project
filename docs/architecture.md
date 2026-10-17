@@ -11,7 +11,7 @@
 | `@dantweb/oxid-fe-user/theme-tools`    | `buildThemes`, `stageThemeSources` — compile the themes                  |
 | `@dantweb/oxid-fe-user/public-config`  | `renderPublicConfig` — the browser's allow-listed, secret-guarded config |
 
-Dependencies are pinned by tag (`oxid-fe-user#v0.3.5`, `oxid-fe-core#v0.8.1`); `overrides` forces one
+Dependencies are pinned by tag (`oxid-fe-user#v0.4.1`, `oxid-fe-core#v0.9.0`); `overrides` forces one
 core for the whole tree. Upgrading = bump the tags, run the gate.
 
 ## Three ways a project changes behaviour
