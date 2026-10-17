@@ -99,3 +99,17 @@ Proof: `LIVE=1 E2E_BASE_URL=https://pay1.oxid.dev:2053 npx playwright test payme
 good card then succeeds, Mollie card (Components, authorized), failed Mollie payment → no order and a
 fresh attempt works, iDEAL — each ending in an order visible in `/dashboard/orders`.
 The specs use the shared sandbox test customer; they create real (test-mode) orders in the pay1 shop.
+
+### Cache policy — every deploy reaches phones and browsers
+
+| Path                                  | `Cache-Control`                       | Why                                                                                   |
+| ------------------------------------- | ------------------------------------- | ------------------------------------------------------------------------------------- |
+| `/assets/*` (content-hashed bundles)  | `public, max-age=31536000, immutable` | a new release has new file names                                                      |
+| `/`, SPA routes (`index.html`)        | `no-cache`                            | always revalidated, so it always points at the newest bundles                         |
+| `/themes/*` (config, css, fonts, img) | `no-cache`                            | **the URL stays the same across releases**: without this, browsers keep the old theme |
+| `/oxid-config.json`                   | `no-store`                            | the instance's configuration applies on the next load                                 |
+
+`no-cache` means "store, but revalidate every time" (ETag → `304`), so it costs one cheap request.
+The deploy workflow's smoke test fails if any of these headers regress. A browser that cached the
+**theme files under the old (header-less) policy** keeps them until its heuristic freshness expires
+(typically hours); clear the site's cache once, or wait.

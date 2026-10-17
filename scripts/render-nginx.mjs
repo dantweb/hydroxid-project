@@ -73,6 +73,14 @@ ${
         return 404;
     }
 ${proxy('/graphql/')}${proxy('/out/pictures/')}
+    # theme files keep their URL across releases (config.json, styles.css, fonts, images): revalidate on
+    # every load (ETag → 304), or phones keep showing the previous release's theme
+    location /themes/ {
+        add_header Cache-Control "no-cache";
+        try_files $uri =404;
+    }
+
+    # content-hashed bundles: a new release has new names, so these can be cached forever
     location /assets/ {
         add_header Cache-Control "public, max-age=31536000, immutable";
     }

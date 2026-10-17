@@ -49,10 +49,20 @@ jobs:
           DEPLOY_USER: ${{ vars.DEPLOY_USER }}
           DEPLOY_SSH_OPTS: -i ~/.ssh/deploy -o StrictHostKeyChecking=yes
         run: sh deploy/deploy.sh
-      - name: Smoke test the three ports
+      - name: Smoke test the three ports (config, YAML hidden, cache policy)
         run: |
           for port in 2053 2083 8443; do
-            curl -fsS "https://pay1.oxid.dev:$port/oxid-config.json" | grep -q hydroxid
-            code="$(curl -s -o /dev/null -w '%{http_code}' "https://pay1.oxid.dev:$port/oxid-config.yaml")"
+            base="https://pay1.oxid.dev:$port"
+            curl -fsS "$base/oxid-config.json" | grep -q hydroxid
+            code="$(curl -s -o /dev/null -w '%{http_code}' "$base/oxid-config.yaml")"
             [ "$code" = 404 ] || { echo "oxid-config.yaml answered $code on $port" >&2; exit 1; }
+            # a phone that loaded an earlier release must pick up this one: no stale index / theme / config
+            header() { curl -sI "$1" | tr -d '\r' | grep -i '^cache-control:' | tr 'A-Z' 'a-z'; }
+            theme="$(curl -fsS "$base/oxid-config.json" | sed -n 's/.*"active": "\(hydroxid-[a-z-]*\)".*/\1/p' | head -1)"
+            header "$base/" | grep -q 'no-cache'                               || { echo "index is cacheable on $port" >&2; exit 1; }
+            header "$base/themes/$theme/config.json" | grep -q 'no-cache'       || { echo "theme config is cacheable on $port" >&2; exit 1; }
+            header "$base/themes/$theme/styles/styles.css" | grep -q 'no-cache' || { echo "theme css is cacheable on $port" >&2; exit 1; }
+            header "$base/oxid-config.json" | grep -q 'no-store'                || { echo "config json is cacheable on $port" >&2; exit 1; }
+            asset="$(curl -fsS "$base/" | sed -n 's|.*src="\(/assets/[^"]*\.js\)".*|\1|p' | head -1)"
+            header "$base$asset" | grep -q 'immutable'                          || { echo "hashed bundle not immutable on $port" >&2; exit 1; }
           done

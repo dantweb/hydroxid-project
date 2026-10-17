@@ -40,6 +40,20 @@ describe('renderNginx', () => {
     }
   });
 
+  it('cache policy: hashed assets immutable; everything that keeps its URL revalidates (no stale releases)', () => {
+    for (const target of ['local', 'pay1']) {
+      const conf = renderNginx(targets, target);
+      expect(conf).toMatch(
+        /location \/assets\/ \{\s*add_header Cache-Control "public, max-age=31536000, immutable";/,
+      );
+      expect(conf).toMatch(
+        /location \/themes\/ \{\s*add_header Cache-Control "no-cache";\s*try_files \$uri =404;/,
+      );
+      expect(conf).toMatch(/location = \/oxid-config\.json \{[^}]*Cache-Control "no-store"/);
+      expect(conf).toMatch(/location \/ \{\s*add_header Cache-Control "no-cache";/); // index.html / SPA routes
+    }
+  });
+
   it('rejects an unknown target and duplicate ports', () => {
     expect(() => renderNginx(targets, 'moon')).toThrow(/unknown target/);
     const clash = { instances: { a: { ports: { local: 1 } }, b: { ports: { local: 1 } } } };
