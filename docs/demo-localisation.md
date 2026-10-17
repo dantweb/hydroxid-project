@@ -24,17 +24,17 @@ plugins/hydroxid/i18n/de.json     "hero": { "title": "Hydration, konstruiert." �
 (Everything else — checkout, account, search, cookie dialog — has its own `i18n/de.json` / `en.json`
 next to its plugin; the instance's language picks the file.)
 
-## On stage (≈ 2½ minutes)
+## On stage (≈ 2 minutes from push to the phone)
 
 1. **Show the device:** open `https://pay1.oxid.dev:2083` on a phone (and the English
    `:2053` next to it). Leave the page open. Point at the hero headline.
 2. **Change the code:** in `plugins/hydroxid/i18n/de.json` change `hero.title`, e.g.
    `"Hydration, konstruiert."` → `"Hydration, konstruiert — live auf der Bühne."`
-3. **Commit and push to `main`** (CI runs: lint, types, unit tests, e2e on all three instances).
-4. **Run the deploy** — GitHub → Actions → _Deploy to pay1.oxid.dev_ → _Run workflow_ → type `deploy`, or:
+3. **Commit and push to `main`** (CI starts: lint, types, unit tests, e2e on all three instances).
+4. **Run the deploy right away** (it repeats lint, types, unit tests and the audit itself, so it need not wait for the CI run) — GitHub → Actions → _Deploy to pay1.oxid.dev_ → _Run workflow_ → type `deploy`, or:
    `gh workflow run deploy.yml -f confirm=deploy`. It builds, ships, switches the release, reloads
    nginx, health-checks, and smoke-tests the cache headers.
-5. **Watch the phone.** Within about 30 seconds of the switch the open page reloads by itself and the
+5. **Watch the phone.** Within about 30 seconds of the release switch the open page reloads by itself and the
    new headline is there. (Backgrounded or locked phone: it updates the moment the page is visible again.)
 
 ## Why it updates by itself
@@ -54,3 +54,16 @@ next to its plugin; the instance's language picks the file.)
 ## After the demo
 
 Revert the wording the same way (edit, push, deploy) — or `git revert` the demo commit and deploy.
+
+## Rehearsal log (pay1, `:2083`, a phone-sized browser left open on the page)
+
+| Time (UTC) | Event                                                                                    |
+| ---------- | ---------------------------------------------------------------------------------------- |
+| 11:50:32   | `hero.title` changed in `de.json`, pushed                                                |
+| 11:52:40   | CI green (2 min)                                                                         |
+| 11:53:56   | deploy finished (1¼ min; the release was switched ≈ 30 s earlier)                        |
+| ≈ 11:53:30 | **the open page reloaded itself** and showed the new headline — nobody touched the phone |
+
+The earlier attempt of the rehearsal also showed a trap worth remembering: tests must not pin the
+wording. Here they read the expected copy from the `i18n/*.json` files, so changing a translation
+never turns CI red.
