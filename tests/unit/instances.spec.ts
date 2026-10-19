@@ -65,10 +65,10 @@ describe('instances', () => {
       );
       // the extending plugin is listed after the plugins whose slots it overrides
       expect(plugins.indexOf('hydroxid')).toBeGreaterThan(plugins.indexOf('shop'));
-      // pay1 offers Stripe and Mollie, inline (iframe) with their PUBLIC values only
-      expect(config.plugins['payment-stripe'].config).toMatchObject({ mode: 'iframe' });
-      expect(config.plugins['payment-stripe'].config.publishable_key).toMatch(/^pk_test_/);
+      // pay1 offers Stripe and Mollie, inline (iframe); their keys come from the shop, sealed
+      expect(config.plugins['payment-stripe'].config).toEqual({ mode: 'iframe' });
       expect(config.plugins['payment-mollie'].config).toMatchObject({ mode: 'iframe' });
+      expect(config.plugins['payment-mollie'].config).not.toHaveProperty('profile_id');
       expect(config.plugins['payment-paypal']).toBeUndefined(); // not installed on pay1
     },
   );

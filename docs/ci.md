@@ -85,7 +85,7 @@ The frontends call the shop's GraphQL API at `/graphql/` (nginx proxies it to th
 
 pay1's shop offers **Stripe** (test mode, automatic capture) and **Mollie** (test mode, manual capture);
 PayPal's module is not installed there. The instances run both inline (iframe mode) with their
-**public** values only (`publishable_key`, `profile_id`) — no secret ever enters this repository.
+**no provider key at all**: the Stripe publishable key and the Mollie profile id (and test mode) are held by the shop and handed to the browser sealed (oxid-fe-user `docs/payments-keys.md`); a key field in an instance config stops the build — no key and no secret ever enters this repository.
 
 Shop-side setup for this (each with a backup of `composer.json` / `composer.lock` next to the original):
 

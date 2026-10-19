@@ -29,12 +29,9 @@ plugins:
   payment-stripe:
     config:
       mode: iframe
-      publishable_key: pk_test_51U2oboD514s7wzZp9C41voTZpZ0aK1TSv6JaAWPlszRaegsUdnILV2JHuxF0GjpqywBs3Afzrg0qrVq81vMmSX2w00W7Fl9qDT
   payment-mollie:
     config:
       mode: iframe
-      profile_id: pfl_cVf8bSWdQV
-      test_mode: true
       methods: [creditcard, ideal, bancontact]
   dashboard: {} # replaced by plugins/dashboard-override (same name)
   hydroxid: {} # extends the peroxid layout plugin (header, front page; the search comes from `shop`) — needs `shop`
