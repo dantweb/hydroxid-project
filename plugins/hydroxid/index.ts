@@ -5,8 +5,8 @@ import en from './i18n/en.json';
 
 /**
  * HydroXid's plugin EXTENDS oxid-fe-user's `peroxid` layout plugin: everything of peroxid — header
- * with search and cart, the front page (hero + product streams), the /search page, its setup and
- * configuration — stays, and HydroXid changes only what is its own:
+ * with the shop's search box and cart, the front page (hero + product streams), its setup and
+ * configuration — stays (`/search` itself is the shop plugin's), and HydroXid changes only what is its own:
  *   - the footer (peroxid's footer + the cookie-settings link of the consent plugin)
  *   - the copy: hero and footer texts
  *   - the default theme

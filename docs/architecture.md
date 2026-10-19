@@ -19,7 +19,8 @@ core for the whole tree. Upgrading = bump the tags, run the gate.
 1. **Override by name** — `main.ts` registers `dashboard`, so the project's plugin replaces the bundled
    one (`plugins/dashboard-override`: spreads the original, changes the greeting copy).
 2. **Extend a plugin** — `plugins/hydroxid` spreads oxid-fe-user's `peroxid` layout plugin (header with
-   search and cart, front page with hero and product streams, `/search`, setup, config) and changes only
+   the shop plugin's search box and cart, front page with hero and product streams, setup, config; the
+   `/search` page belongs to the `shop` plugin) and changes only
    the footer slot and the copy (`peroxid.hero.*`, `peroxid.footer.*`). It keeps peroxid's plugin `name`
    because peroxid's components read the `peroxid.*` message namespace; in `oxid-config.yaml` it is listed
    as `hydroxid` (the loader key in `src/main.ts`). Its footer _wraps_ peroxid's own footer component

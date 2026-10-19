@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { rejectAllCookies } from './helpers/consent';
 import { greetingCopy, hydroxidCopy } from './helpers/copy';
 import { mockShop, signInAsAda } from './helpers/mockShop';
 
@@ -35,18 +36,7 @@ const EXPECTED = {
 
 test.beforeEach(async ({ page }) => {
   await mockShop(page);
-  await page.addInitScript(() => {
-    // decided already: these tests are about layout and theme, not the dialog
-    localStorage.setItem(
-      'hydroxid_cookie_consent',
-      JSON.stringify({
-        version: 1,
-        decidedAt: '2026-01-01T00:00:00Z',
-        method: 'reject_all',
-        categories: { necessary: true, preferences: false, statistics: false, marketing: false },
-      }),
-    );
-  });
+  await rejectAllCookies(page);
 });
 
 test(`the ${instance} instance runs its theme with its own typeface`, async ({ page }) => {

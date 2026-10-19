@@ -61,13 +61,19 @@ describe('gdpr-cookie-consent plugin', () => {
 });
 
 describe('hydroxid plugin (EXTENDS the peroxid layout plugin)', () => {
-  it('keeps everything of peroxid: header, front page, search route, setup, requirements', () => {
+  it('keeps everything of peroxid: header, front page, setup, requirements', () => {
     expect(hydroxid.overrides?.header).toBe(peroxid.overrides?.header);
     expect(hydroxid.overrides?.home).toBe(peroxid.overrides?.home);
     expect(hydroxid.routes).toBe(peroxid.routes);
     expect(hydroxid.setup).toBe(peroxid.setup);
     expect(hydroxid.requires).toEqual(peroxid.requires);
     expect(hydroxid.defaultConfig).toBe(peroxid.defaultConfig);
+  });
+
+  it('has no search of its own: /search and its copy come from the shop plugin', () => {
+    expect(hydroxid.routes ?? []).toEqual([]);
+    expect(hydroxid.messages?.en).not.toHaveProperty('search');
+    expect(hydroxid.messages?.de).not.toHaveProperty('search');
   });
 
   it('keeps peroxid’s plugin name, so the peroxid.* message namespace keeps working', () => {
@@ -92,7 +98,7 @@ describe('hydroxid plugin (EXTENDS the peroxid layout plugin)', () => {
     expect(en.footer).toMatchObject(hydroxidEn.footer);
     expect(en.hero.title).not.toBe(original.hero.title); // the copy really replaces peroxid's
     // untouched groups and keys are peroxid's own
-    expect(en.search).toEqual(original.search);
+    expect(en.footer.search).toBe(original.footer.search);
     expect(en.hero.secondary).toBe(original.hero.secondary);
   });
 
