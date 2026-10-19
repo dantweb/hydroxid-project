@@ -1,6 +1,6 @@
 {
   "name": "hydroxid-project",
-  "version": "0.1.0",
+  "version": "0.9.9",
   "description": "HydroXid — a client storefront built on @dantweb/oxid-fe-user: own plugins, own themes, GDPR cookie consent.",
   "private": true,
   "type": "module",
