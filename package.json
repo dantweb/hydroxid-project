@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "@dantweb/oxid-fe-core": "github:dantweb/oxid-fe-core#a9dc9f0ddd8dab838f111b0e38181d246097bc9b",
-    "@dantweb/oxid-fe-user": "github:dantweb/oxid-fe-user#fb8b164a4600264ed461cbf75b5622ecdc2f67ca",
+    "@dantweb/oxid-fe-user": "github:dantweb/oxid-fe-user#e6bd62d49516111e09b37b00886084ddb090a5c4",
     "pinia": "^3.0.1",
     "vue": "^3.5.13",
     "vue-i18n": "^11.1.0",

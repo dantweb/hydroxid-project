@@ -28,7 +28,7 @@ describe('instances', () => {
     }
   });
 
-  it('two instances are German and one is English — one language each, so the browser cannot override it', () => {
+  it('vibrant and light-red offer two languages (opening in their own default), dark-ocean one', () => {
     const locales = Object.fromEntries(
       ['vibrant', 'dark-ocean', 'light-red'].map((name) => {
         const i18n = JSON.parse(renderPublicConfig(yamlOf(name))).i18n;
@@ -36,9 +36,17 @@ describe('instances', () => {
       }),
     );
 
-    expect(locales.vibrant).toMatchObject({ default_locale: 'en', locales: ['en'] });
+    expect(locales.vibrant).toMatchObject({
+      default_locale: 'en',
+      locales: ['en', 'de'],
+      browser_language: false,
+    });
     expect(locales['dark-ocean']).toMatchObject({ default_locale: 'de', locales: ['de'] });
-    expect(locales['light-red']).toMatchObject({ default_locale: 'de', locales: ['de'] });
+    expect(locales['light-red']).toMatchObject({
+      default_locale: 'de',
+      locales: ['de', 'en'],
+      browser_language: false,
+    });
   });
 
   it('every instance keeps devices on the latest release', () => {

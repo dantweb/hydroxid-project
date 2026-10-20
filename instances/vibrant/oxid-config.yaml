@@ -9,10 +9,12 @@ shop:
   graphql_url: /graphql/
 
 i18n:
-  # one language per instance: the browser's language does not override it
+  # the instance's default language opens first; the browser's language never overrides it,
+  # the shopper switches with the header dropdown (oxid-fe-user i18n.browser_language)
   default_locale: en
   fallback_locale: en
-  locales: [en]
+  locales: [en, de]
+  browser_language: false
 
 theme:
   default: default
