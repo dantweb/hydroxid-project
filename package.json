@@ -19,15 +19,15 @@
     "build:nginx": "node scripts/render-nginx.mjs local && node scripts/render-nginx.mjs pay1"
   },
   "dependencies": {
-    "@dantweb/oxid-fe-core": "github:dantweb/oxid-fe-core#a9dc9f0ddd8dab838f111b0e38181d246097bc9b",
-    "@dantweb/oxid-fe-user": "github:dantweb/oxid-fe-user#e6bd62d49516111e09b37b00886084ddb090a5c4",
+    "@dantweb/oxid-fe-core": "github:dantweb/oxid-fe-core#main",
+    "@dantweb/oxid-fe-user": "github:dantweb/oxid-fe-user#main",
     "pinia": "^3.0.1",
     "vue": "^3.5.13",
     "vue-i18n": "^11.1.0",
     "vue-router": "^4.5.0"
   },
   "overrides": {
-    "@dantweb/oxid-fe-core": "github:dantweb/oxid-fe-core#a9dc9f0ddd8dab838f111b0e38181d246097bc9b"
+    "@dantweb/oxid-fe-core": "github:dantweb/oxid-fe-core#main"
   },
   "devDependencies": {
     "@eslint/js": "^9.20.0",
