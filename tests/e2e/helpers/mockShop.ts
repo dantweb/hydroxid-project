@@ -12,11 +12,6 @@ const answer = (data: unknown) => ({
   contentType: 'application/json',
   body: JSON.stringify({ data }),
 });
-const failure = (message: string) => ({
-  status: 200,
-  contentType: 'application/json',
-  body: JSON.stringify({ errors: [{ message }] }),
-});
 
 /**
  * A minimal stand-in for the shop's GraphQL API, so the suite runs without a shop (CI).
@@ -58,7 +53,7 @@ export async function mockShop(page: Page): Promise<void> {
       );
     }
     if (query.includes('savedList')) {
-      return route.fulfill(failure('Basket "noticelist" not found for user "u1"'));
+      return route.fulfill(answer({ customer: { baskets: [] } }));
     }
     if (query.includes('action(')) {
       return route.fulfill(answer({ action: { products: [] } }));
