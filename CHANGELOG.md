@@ -8,6 +8,10 @@ Inherits oxid-fe-user 0.7.0 / oxid-fe-core 0.10.0 (graphql-comply sprints 138d, 
 > `overrides` entry) at `#feature/graphql-comply` while those branches are unmerged. They go back to `#main`
 > when the branches merge. Never a commit SHA.
 
+### Docs
+
+- 138h: `docs/ci.md` warns that Playwright traces hold the bearer token and the live-shop login.
+
 ### Added
 
 - **139b** — `docs/instances.md`; e2e `language.spec.ts` asserts the `lang` id of GraphQL requests after a switch;

@@ -18,6 +18,13 @@
 | `CORE_DEPLOY_KEY` | read access to `dantweb/oxid-fe-core` |
 | `USER_DEPLOY_KEY` | read access to `dantweb/oxid-fe-user` |
 
+## Playwright traces hold secrets
+
+`retain-on-failure` traces, videos and `error-context.md` under `test-results/` keep the bearer
+token, the live-shop login (`SHOP_USER`/`SHOP_PASSWORD`) and everything typed into forms. On a
+shared machine delete `test-results/` after a failed live run; CI uploads only the mocked suite's
+report and must never upload traces of a live run.
+
 ## Deployment (`.github/workflows/deploy.yml`) — manual only
 
 Target: `pay1.oxid.dev`, directory `/var/www/oxid/oxid75/hydroxid-project`:
