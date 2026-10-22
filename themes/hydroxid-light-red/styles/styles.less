@@ -55,3 +55,31 @@ h3 {
   font-family: var(--oxfe-font-heading);
   font-weight: 700;
 }
+
+// Light Red's own hero photography (warm still life, objects on the right, open wall for the copy on the left);
+// same selector and overlay as peroxid's, only the picture differs.
+html .pxd-hero.pxd-hero {
+  background-image:
+    linear-gradient(
+      90deg,
+      rgba(42, 15, 15, 0.82) 0%,
+      rgba(42, 15, 15, 0.45) 50%,
+      rgba(42, 15, 15, 0) 100%
+    ),
+    url('../images/hero.jpg');
+  background-position: right center;
+}
+
+@media (max-width: 600px) {
+  html .pxd-hero.pxd-hero {
+    background-image:
+      linear-gradient(
+        0deg,
+        rgba(42, 15, 15, 0.9) 0%,
+        rgba(42, 15, 15, 0.55) 60%,
+        rgba(42, 15, 15, 0.2) 100%
+      ),
+      url('../images/hero.jpg');
+    background-position: 85% center;
+  }
+}
