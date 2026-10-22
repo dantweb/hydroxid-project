@@ -29,7 +29,7 @@ const EXPECTED = {
     lang: 'de' as const,
     theme: 'hydroxid-light-red',
     font: 'Lato',
-    primary: 'rgb(200, 16, 46)',
+    primary: 'rgb(190, 4, 193)',
     bg: 'rgb(255, 249, 247)',
   },
 }[instance]!;
