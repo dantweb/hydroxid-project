@@ -66,7 +66,7 @@ test('the hydroxid plugin extends peroxid: its header and front page, HydroXid�
 }) => {
   await page.goto('/');
   await expect(page.getByTestId('pxd-header')).toBeVisible(); // peroxid's own header
-  await expect(page.getByTestId('pxd-brand')).toHaveText(/HydroXid/);
+  await expect(page.getByTestId('pxd-brand')).toHaveText(/PEROXID/);
   await expect(page.getByTestId('pxd-hero')).toBeVisible(); // peroxid's front page …
   await expect(page.getByTestId('pxd-hero')).toContainText(COPY[EXPECTED.lang].hero); // … with HydroXid's copy
   await expect(page.getByTestId('hx-footer')).toBeVisible();
