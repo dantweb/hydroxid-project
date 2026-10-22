@@ -54,6 +54,38 @@ describe('renderNginx', () => {
     }
   });
 
+  it('log hygiene (138d): every access_log uses the `headless` format — the path only, never a query string or referer', () => {
+    for (const target of ['local', 'pay1']) {
+      const conf = renderNginx(targets, target);
+      const format = conf.match(/^log_format headless '([^']*)';$/m)?.[1] ?? '';
+
+      expect(format).toBe(
+        '$remote_addr - [$time_local] "$request_method $uri $server_protocol" $status $body_bytes_sent',
+      );
+      expect(format).toContain('$uri');
+      for (const leaky of [
+        '$request ',
+        '$request"',
+        '$request_uri',
+        '$args',
+        '$query_string',
+        '$http_referer',
+      ]) {
+        expect(format).not.toContain(leaky);
+      }
+      // the format is defined once, before the first server block that uses it
+      expect(conf.match(/^log_format /gm)).toHaveLength(1);
+      expect(conf.indexOf('log_format')).toBeLessThan(conf.indexOf('server {'));
+
+      const accessLogs = conf.match(/^\s*access_log .*$/gm) ?? [];
+      expect(accessLogs).toHaveLength(Object.keys(targets.instances).length);
+      for (const line of accessLogs) {
+        expect(line).toMatch(/ headless;$/);
+      }
+      expect(conf).not.toMatch(/\$request\b(?!_method)/); // nowhere in the file, not even in a comment
+    }
+  });
+
   it('rejects an unknown target and duplicate ports', () => {
     expect(() => renderNginx(targets, 'moon')).toThrow(/unknown target/);
     const clash = { instances: { a: { ports: { local: 1 } }, b: { ports: { local: 1 } } } };

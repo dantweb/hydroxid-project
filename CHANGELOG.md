@@ -14,6 +14,10 @@ Inherits oxid-fe-user 0.7.0 / oxid-fe-core 0.10.0 (graphql-comply sprints 138d, 
   unit tests of the rendered public config keys (`shop.language_ids`, `shop.id`, `checkout.guest`, `debug.errors`).
   No instance declares `shop.language_ids`: the shop's ids are the default `{ de: 0, en: 1 }`.
 
+- **138d** — nginx `log_format headless` (`$uri`, no query string, no referer) for every instance block of
+  `build/nginx-local.conf` / `build/nginx-pay1.conf`; unit test of the rendered config; `docs/ci.md` says the
+  host-level nginx in front must log without the query string too. `nginx -t` verified on both rendered files.
+
 ### Changed
 
 - Dependencies: oxid-fe-core 0.10.0, oxid-fe-user 0.7.0 (`createAppRouter(registry, auth, config)`, payment

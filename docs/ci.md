@@ -59,6 +59,21 @@ nginx on pay1 listens on these origin ports with TLS and proxies `/graphql/` to 
 | `DEPLOY_USER`        | variable | `root` (nginx reload and `/etc/nginx` need it) |
 | `DEPLOY_KNOWN_HOSTS` | variable | the server's pinned host key (`ssh-keyscan`)   |
 
+### Access logs carry no query string (sprint 138d)
+
+A provider's return URL carries `session_id` / `PayerID` / `token`, a password-reset link a `uid`. The
+instance blocks therefore log with `log_format headless` (`$remote_addr - [$time_local] "$request_method $uri
+$server_protocol" $status $body_bytes_sent`): the path only, no query string, no referer. Every
+`access_log` of `build/nginx-pay1.conf` (written to `/var/log/nginx/hydroxid-project.access.log`) uses it;
+`tests/unit/nginx.spec.ts` renders the config and fails on `$request`, `$request_uri`, `$args`,
+`$query_string` or `$http_referer`.
+
+**Host-level nginx in front.** If another nginx (or Cloudflare's origin logging, a load balancer) sits in front
+of these ports, its own `access_log` must drop the query string too — a `log_format` with `$uri` instead of
+`$request`. That config is outside this repository; its owner (server administration) has to make the change.
+Check: `sudo grep -rnE 'log_format|access_log' /etc/nginx/` and `sudo grep -c 'session_id=\|PayerID=\|uid=' <log>`
+must print `0` for the logs written after the change.
+
 ### The shop on pay1 (GraphQL)
 
 The frontends call the shop's GraphQL API at `/graphql/` (nginx proxies it to the shop's apache on
