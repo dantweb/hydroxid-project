@@ -1,19 +1,21 @@
 import { expect, test } from '@playwright/test';
 import { greetingCopy } from './helpers/copy';
+import { SHOP_LOGIN_CONFIGURED, SHOP_LOGIN_MISSING } from './helpers/payments';
 
 /**
  * Against a REAL shop (not part of CI — it needs the shop's GraphQL):
- *   E2E_BASE_URL=https://pay1.oxid.dev:2053 LIVE=1 npx playwright test live
+ *   E2E_BASE_URL=https://pay1.oxid.dev:2053 LIVE=1 SHOP_USER=… SHOP_PASSWORD=… npx playwright test live
  * Proves the instance is connected to its shop: the catalogue loads, a customer can sign in, the
  * account shows HydroXid's overriding greeting, and the checkout reaches delivery and payment.
  */
 test.skip(!process.env.LIVE || !process.env.E2E_BASE_URL, 'set LIVE=1 and E2E_BASE_URL');
+test.skip(!SHOP_LOGIN_CONFIGURED, SHOP_LOGIN_MISSING);
 test.describe.configure({ mode: 'serial' });
 test.setTimeout(120_000);
 
 const USER = {
-  email: process.env.SHOP_USER ?? 'playwright.user@oxid-esales.dev',
-  password: process.env.SHOP_PASSWORD ?? 'useruser',
+  email: process.env.SHOP_USER ?? '',
+  password: process.env.SHOP_PASSWORD ?? '',
 };
 
 test.beforeEach(async ({ page }) => {

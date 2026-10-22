@@ -1,0 +1,13 @@
+# Historical findings pinned by exact fingerprint (commit:file:rule:line), one per line.
+# Written 2026-10-22 (subsprint 138a). Every entry below was redacted in the working tree
+# in the same subsprint or is a documented false positive; none of them narrows the scan.
+# A history rewrite is the user's decision (138a A4); until then these keep the full-history
+# scan green without hiding anything new.
+
+# 04d8cf89: pay1 payments: the Stripe publishable key in three instance configs (public id; removed from the tree in 767768b, rewrite decision pending, 138a A4)
+04d8cf8998ecb5b3554e5a56f566406995b989e2:instances/dark-ocean/oxid-config.yaml:stripe-publishable-key:31
+04d8cf8998ecb5b3554e5a56f566406995b989e2:instances/light-red/oxid-config.yaml:stripe-publishable-key:31
+04d8cf8998ecb5b3554e5a56f566406995b989e2:instances/vibrant/oxid-config.yaml:stripe-publishable-key:31
+
+# e46d3b5a: the pay1 test login as the live spec's fallback; redacted in the tree by 138a, password to be rotated (A3)
+e46d3b5a5ce5389eebcc3bf6cf7d90bc65e85483:tests/e2e/live.spec.ts:credential-pair-email-then-password:14

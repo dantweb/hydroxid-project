@@ -1,12 +1,18 @@
 import { expect, test } from '@playwright/test';
-import { confirmTerms, openPaymentStep } from './helpers/payments';
+import {
+  confirmTerms,
+  openPaymentStep,
+  SHOP_LOGIN_CONFIGURED,
+  SHOP_LOGIN_MISSING,
+} from './helpers/payments';
 
 /**
  * Against a REAL shop: the instance's language reaches the shop, so products and categories come in
  * that language — whatever language the visitor's browser is set to.
- *   LIVE=1 E2E_BASE_URL=https://pay1.oxid.dev:2083 INSTANCE=dark-ocean npx playwright test localisation-live
+ *   LIVE=1 E2E_BASE_URL=https://pay1.oxid.dev:2083 INSTANCE=dark-ocean SHOP_USER=… SHOP_PASSWORD=… npx playwright test localisation-live
  */
 test.skip(!process.env.LIVE || !process.env.E2E_BASE_URL, 'set LIVE=1 and E2E_BASE_URL');
+test.skip(!SHOP_LOGIN_CONFIGURED, SHOP_LOGIN_MISSING);
 const LANG: Record<string, 'de' | 'en'> = { vibrant: 'en', 'dark-ocean': 'de', 'light-red': 'de' };
 const lang = LANG[process.env.INSTANCE ?? 'vibrant'];
 const browserLocale = lang === 'de' ? 'en-US' : 'de-DE'; // deliberately the OTHER language

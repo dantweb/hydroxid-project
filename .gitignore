@@ -8,3 +8,6 @@ playwright-report/
 test-results/
 .env
 *.log
+
+# Secret-scan reports produced by .github/workflows/gitleaks.yml
+gitleaks-*.sarif

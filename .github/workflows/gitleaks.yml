@@ -1,0 +1,57 @@
+name: Secret scan
+
+# Added 2026-10-22 (subsprint 138a) as a copy of the same job in payment-base,
+# after an audit of the headless payment channel found credentials committed
+# across the sibling repositories (demo-shop logins in e2e fixtures, a sandbox
+# API key and a client secret in dev-log reports, an access token in copied SDK
+# docs). This job is what keeps the next one from reaching a pushed branch.
+#
+# Deliberately NOT gitleaks/gitleaks-action: that action requires a
+# GITLEAKS_LICENSE for repositories owned by an organisation. The scanner
+# itself is free, so it runs from its own container image.
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  gitleaks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout current project
+        uses: actions/checkout@v5
+        with:
+          # Full history, because the commit scan below covers all of it.
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Scan the working tree
+        run: |
+          docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:latest \
+            dir /repo --config /repo/.gitleaks.toml --redact --no-banner \
+            --report-format sarif --report-path /repo/gitleaks-worktree.sarif
+
+      # A secret added and then deleted in the same branch never appears in the
+      # working tree, but it is published the moment the branch is pushed. So
+      # scan the commits themselves, all branches, full history. Historical
+      # findings that were redacted in the tree but not rewritten out of the
+      # history are pinned one by one in .gitleaksignore (commit:file:rule:line);
+      # that file never narrows the scan.
+      - name: Scan the commit history
+        run: |
+          docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:latest \
+            git /repo --config /repo/.gitleaks.toml --redact --no-banner \
+            --log-opts="--all --no-merges" \
+            --report-format sarif --report-path /repo/gitleaks-history.sarif
+
+      - name: Upload the findings
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gitleaks-sarif
+          path: gitleaks-*.sarif
+          if-no-files-found: ignore
