@@ -1,6 +1,6 @@
 {
   "name": "hydroxid-project",
-  "version": "0.9.9",
+  "version": "0.10.0",
   "description": "HydroXid — a client storefront built on @dantweb/oxid-fe-user: own plugins, own themes, GDPR cookie consent.",
   "private": true,
   "type": "module",
@@ -19,15 +19,15 @@
     "build:nginx": "node scripts/render-nginx.mjs local && node scripts/render-nginx.mjs pay1"
   },
   "dependencies": {
-    "@dantweb/oxid-fe-core": "github:dantweb/oxid-fe-core#main",
-    "@dantweb/oxid-fe-user": "github:dantweb/oxid-fe-user#main",
+    "@dantweb/oxid-fe-core": "github:dantweb/oxid-fe-core#feature/graphql-comply",
+    "@dantweb/oxid-fe-user": "github:dantweb/oxid-fe-user#feature/graphql-comply",
     "pinia": "^3.0.1",
     "vue": "^3.5.13",
     "vue-i18n": "^11.1.0",
     "vue-router": "^4.5.0"
   },
   "overrides": {
-    "@dantweb/oxid-fe-core": "github:dantweb/oxid-fe-core#main"
+    "@dantweb/oxid-fe-core": "github:dantweb/oxid-fe-core#feature/graphql-comply"
   },
   "devDependencies": {
     "@eslint/js": "^9.20.0",
