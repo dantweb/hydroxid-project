@@ -29,7 +29,7 @@ next to its plugin; the instance's language picks the file.)
 1. **Show the device:** open `https://pay1.oxid.dev:2083` on a phone (and the English
    `:2053` next to it). Leave the page open. Point at the hero headline.
 2. **Change the code:** in `plugins/hydroxid/i18n/de.json` change `hero.title`, e.g.
-   `"Stücke, die bleiben."` → `"Stücke, die bleiben — live auf der Bühne."`
+   `"Peroxid"` → `"Peroxid — live auf der Bühne"`
 3. **Commit and push to `main`** (CI starts: lint, types, unit tests, e2e on all three instances).
 4. **Run the deploy right away** (it repeats lint, types, unit tests and the audit itself, so it need not wait for the CI run) — GitHub → Actions → _Deploy to pay1.oxid.dev_ → _Run workflow_ → type `deploy`, or:
    `gh workflow run deploy.yml -f confirm=deploy`. It builds, ships, switches the release, reloads

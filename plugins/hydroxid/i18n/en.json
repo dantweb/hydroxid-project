@@ -1,8 +1,8 @@
 {
   "hero": {
-    "eyebrow": "The Peroxid edit",
-    "title": "Pieces that stay.",
-    "lead": "A considered selection of the new, the exceptional and the essential — chosen for those who notice the details.",
+    "eyebrow": "Unofficial project",
+    "title": "Peroxid",
+    "lead": "A bottomless head for a headless OXID shop — an unofficial TS/Vue frontend app.",
     "cta": "Discover the collection"
   },
   "footer": {
