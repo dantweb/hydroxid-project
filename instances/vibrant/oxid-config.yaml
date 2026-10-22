@@ -3,7 +3,7 @@
 # !! secrets refused). Everything under plugins.*.config is PUBLIC. !!
 instance:
   id: hydroxid-vibrant
-  name: HydroXid
+  name: PEROXID
 
 shop:
   graphql_url: /graphql/

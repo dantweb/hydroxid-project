@@ -18,6 +18,13 @@
 | `CORE_DEPLOY_KEY` | read access to `dantweb/oxid-fe-core` |
 | `USER_DEPLOY_KEY` | read access to `dantweb/oxid-fe-user` |
 
+## Playwright traces hold secrets
+
+`retain-on-failure` traces, videos and `error-context.md` under `test-results/` keep the bearer
+token, the live-shop login (`SHOP_USER`/`SHOP_PASSWORD`) and everything typed into forms. On a
+shared machine delete `test-results/` after a failed live run; CI uploads only the mocked suite's
+report and must never upload traces of a live run.
+
 ## Deployment (`.github/workflows/deploy.yml`) — manual only
 
 Target: `pay1.oxid.dev`, directory `/var/www/oxid/oxid75/hydroxid-project`:
@@ -59,6 +66,21 @@ nginx on pay1 listens on these origin ports with TLS and proxies `/graphql/` to 
 | `DEPLOY_USER`        | variable | `root` (nginx reload and `/etc/nginx` need it) |
 | `DEPLOY_KNOWN_HOSTS` | variable | the server's pinned host key (`ssh-keyscan`)   |
 
+### Access logs carry no query string (sprint 138d)
+
+A provider's return URL carries `session_id` / `PayerID` / `token`, a password-reset link a `uid`. The
+instance blocks therefore log with `log_format headless` (`$remote_addr - [$time_local] "$request_method $uri
+$server_protocol" $status $body_bytes_sent`): the path only, no query string, no referer. Every
+`access_log` of `build/nginx-pay1.conf` (written to `/var/log/nginx/hydroxid-project.access.log`) uses it;
+`tests/unit/nginx.spec.ts` renders the config and fails on `$request`, `$request_uri`, `$args`,
+`$query_string` or `$http_referer`.
+
+**Host-level nginx in front.** If another nginx (or Cloudflare's origin logging, a load balancer) sits in front
+of these ports, its own `access_log` must drop the query string too — a `log_format` with `$uri` instead of
+`$request`. That config is outside this repository; its owner (server administration) has to make the change.
+Check: `sudo grep -rnE 'log_format|access_log' /etc/nginx/` and `sudo grep -c 'session_id=\|PayerID=\|uid=' <log>`
+must print `0` for the logs written after the change.
+
 ### The shop on pay1 (GraphQL)
 
 The frontends call the shop's GraphQL API at `/graphql/` (nginx proxies it to the shop's apache on
@@ -78,8 +100,63 @@ The frontends call the shop's GraphQL API at `/graphql/` (nginx proxies it to th
 - After `composer update`: `oe:module:install` and `oe:module:activate` for `oe_graphql_base` and
   `oe_graphql_storefront`, `oe:graphql:cache-clear`, delete `var/cache/container/container_cache_shop_1.php`.
 - Backups of the previous files: `composer.json.bak-20261016-graphql`, `composer.lock.bak-20261016-graphql`.
-- Proof: `LIVE=1 E2E_BASE_URL=https://pay1.oxid.dev:2053 npx playwright test live` — catalogue, sign-in,
+- Proof: `LIVE=1 E2E_BASE_URL=https://pay1.oxid.dev:2053 SHOP_USER=… SHOP_PASSWORD=… npx playwright test live` — catalogue, sign-in,
   account greeting, checkout (all three ports).
+
+### Updating the shop on pay1 (sprint 139a, 138b, 138d)
+
+GraphQLite's schema is cached on the file system and never cleared by itself: a module update that adds a
+query (`paymentClientConfig`, …) can leave the old schema live and answer `Cannot query field
+"paymentClientConfig"`. Run these steps, in this order, from the shop root on pay1 after **every** shop
+update:
+
+1. `composer update` (the modules' new versions; read its advisory output, never waive one).
+2. Re-activate the modules: `vendor/bin/oe-console oe:module:install-configuration` where the module
+   configuration changed, then `oe:module:activate` for `oe_graphql_base`, `oe_graphql_storefront`,
+   `oe_payment_base` and each payment module (`oe:module:deactivate` first if its activation is stale).
+3. **Migrations of payment-base:** `vendor/oxid-esales/payment-base/bin/run-migrations.sh` (from the shop
+   root; it needs PHP 8.3+ and the doctrine migration wrapper, and exits quietly if either is missing — read
+   its output for `Migrations completed.`). Version `20261022100000` hashes the stored headless contract
+   tokens (SHA-256, sprint 138b); a checkout started before it is finished with the old plaintext token, so
+   run it in a quiet moment.
+4. `vendor/bin/oe-console oe:graphql:cache-clear`, then delete
+   `var/cache/container/container_cache_shop_1.php`.
+5. **Smoke query** — the new field must be in the schema (a stale cache fails here):
+
+   ```bash
+   curl -sk -H 'Host: pay1.oxid.dev' -H 'Content-Type: application/json' \
+     'https://127.0.0.1:8543/graphql/?lang=1&shp=1' \
+     -d '{"query":"{ __type(name: \"Query\") { fields { name } } }"}' | grep -o 'paymentClientConfig'
+   ```
+
+   It prints `paymentClientConfig`. Nothing printed means the schema is stale (repeat step 4) or the module is
+   not active (step 2). A real query follows with a token, as in the stripe module's
+   `docs/for_developer/05-headless-graphql-checkout.md`.
+
+### The `/graphql/` rewrite (QSA, skipSession)
+
+nginx proxies `/graphql/` to the shop's apache; apache's rewrite in the shop's web-root `.htaccess` turns it
+into the widget controller. Both flags matter: `skipSession=1` (the shop must not open a session cookie for an API
+call) and `QSA` (the query string — `lang`, `shp` of sprint 139b — must survive the rewrite, or the shop
+answers in its default language and subshop). On the host, verify it in the shop's `.htaccess`:
+
+```bash
+grep -n 'graphql' /var/www/oxid/oxid75/source/.htaccess
+# expect exactly: RewriteRule ^graphql/?$    widget.php?cl=graphql&skipSession=1   [QSA,NC,L]
+```
+
+(Use the shop's web root of the pay1 container's mount if it differs.) `skipSession=1` and `QSA` must both
+appear on that line; an `.htaccess` regenerated by a shop update can lose them — check after every update. The
+behaviour proof is the language: `curl -sk … '/graphql/?lang=0'` and `'?lang=1'` of a localised field answer in
+different languages.
+
+### PHP setting for the shop's log
+
+Set `zend.exception_ignore_args=On` in the shop's PHP ini (PHP's production default; the SDK's development
+image may have it off). With it off, graphql-base's stack traces copy the full query text — return URLs and
+contract tokens — into `oxideshop.log` (finding of sprint 138d). Check:
+`php -r 'var_dump(ini_get("zend.exception_ignore_args"));'` inside the shop's php-fpm/apache container (the
+CLI may read another ini than the web SAPI: check `php-fpm -i` / `phpinfo()` there too).
 
 ### Payments on pay1
 
@@ -95,7 +172,7 @@ Shop-side setup for this (each with a backup of `composer.json` / `composer.lock
 | `oxid-esales/mollie-payment` **`dev-b-7.4.x`** (upstream)                                                                       | the headless `cardToken` / `uiMode: embedded` change for Mollie Components is merged upstream (OXID-eSales/mollie-payment#8, `7fb262a`)                                                                                                                            |
 | `oxid-esales/stripe-wallet` pinned to branch `feature/session-locale-from-request-language` (`b98e559`, in the OXID repository) | Checkout Sessions are created in the shop's active language (`locale`); without it Stripe's form follows the browser. CI on that branch passed (OXID CE 7.4 / 7.5 / 7.6). **When the branch is merged into `b-7.4.x`, set the requirement back to `dev-b-7.4.x`.** |
 
-Proof: `LIVE=1 E2E_BASE_URL=https://pay1.oxid.dev:2053 npx playwright test payments-live --workers=1`
+Proof: `LIVE=1 E2E_BASE_URL=https://pay1.oxid.dev:2053 SHOP_USER=… SHOP_PASSWORD=… npx playwright test payments-live --workers=1`
 (and `:2083`, `:8443`): Stripe test card pays inline, a declined card is explained inside the form and a
 good card then succeeds, Mollie card (Components, authorized), failed Mollie payment → no order and a
 fresh attempt works, iDEAL — each ending in an order visible in `/dashboard/orders`.

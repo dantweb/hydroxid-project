@@ -27,6 +27,16 @@ describe('dashboard-override (replaces the bundled plugin by name)', () => {
     expect(dashboardOverride.messages?.en.menu).toEqual(base.messages?.en.menu);
   });
 
+  it('keeps the payment-state texts of the orders list (oxid-fe-user 0.7.0, dashboard.orders.payment.*)', () => {
+    for (const locale of ['en', 'de']) {
+      const orders = (dashboardOverride.messages?.[locale] as { orders?: { payment?: object } })
+        .orders;
+      expect(Object.keys(orders?.payment ?? {})).toEqual(
+        expect.arrayContaining(['completed', 'failed', 'unknown']),
+      );
+    }
+  });
+
   it('is distinguishable from the original', () => {
     expect(dashboardOverride.version).toContain('+hydroxid');
   });

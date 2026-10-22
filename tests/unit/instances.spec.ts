@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { renderPublicConfig } from '@dantweb/oxid-fe-user/public-config';
+import { parse } from 'yaml';
 import { describe, expect, it } from 'vitest';
 
 interface Targets {
@@ -80,4 +81,53 @@ describe('instances', () => {
       expect(config.plugins['payment-paypal']).toBeUndefined(); // not installed on pay1
     },
   );
+
+  describe('public config keys of oxid-fe-user 0.7.0 (shop.language_ids, shop.id, checkout.guest, debug.errors)', () => {
+    const yaml = `
+instance: { id: probe, name: Probe }
+shop:
+  graphql_url: /graphql/
+  id: 2
+  language_ids: { de: 0, en: 1, fr: 2 }
+  admin_password: not-for-the-browser
+checkout:
+  guest: false
+  internal: nope
+debug:
+  errors: true
+  trace: nope
+`;
+
+    it('the allow-list renders them and drops everything else next to them', () => {
+      const config = JSON.parse(renderPublicConfig(yaml));
+
+      expect(config.shop).toEqual({
+        graphql_url: '/graphql/',
+        id: 2,
+        language_ids: { de: 0, en: 1, fr: 2 },
+      });
+      expect(config.checkout).toEqual({ guest: false });
+      expect(config.debug).toEqual({ errors: true });
+    });
+
+    it('the instances declare language_ids/id only where the shop differs from { de: 0, en: 1 } — none does, the host default applies', () => {
+      for (const name of names) {
+        const declared = parse(yamlOf(name)).shop;
+        expect(declared).not.toHaveProperty('language_ids');
+        expect(declared).not.toHaveProperty('id');
+        const config = JSON.parse(renderPublicConfig(yamlOf(name)));
+        // the rendered file carries only what is declared; the default is applied by the host
+        // (src/config/schema.ts) and proven on the wire by tests/e2e/language.spec.ts
+        expect(config.shop).toEqual({ graphql_url: '/graphql/' });
+      }
+    });
+
+    it('guest checkout stays on (the default) for every instance; debug details stay off', () => {
+      for (const name of names) {
+        const config = JSON.parse(renderPublicConfig(yamlOf(name)));
+        expect(config.checkout?.guest ?? true).toBe(true);
+        expect(config.debug?.errors ?? false).toBe(false);
+      }
+    });
+  });
 });

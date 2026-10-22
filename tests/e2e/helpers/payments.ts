@@ -20,6 +20,11 @@ export const PAYMENT_IDS = {
   mollie: 'oe_payments_mollie',
 } as const;
 
+/** The shop customer the live specs sign in as. No default: a committed login is a leak (138a). */
+export const SHOP_LOGIN_CONFIGURED = !!process.env.SHOP_USER && !!process.env.SHOP_PASSWORD;
+export const SHOP_LOGIN_MISSING =
+  'SHOP_USER / SHOP_PASSWORD not set (the shop customer the live specs sign in as)';
+
 /** A returning visitor's cookie decision: these specs are about payments, not the dialog. */
 export async function decideCookies(page: Page): Promise<void> {
   await page.addInitScript(() => {
@@ -37,10 +42,8 @@ export async function decideCookies(page: Page): Promise<void> {
 
 export async function signIn(page: Page): Promise<void> {
   await page.goto('/login');
-  await page
-    .locator('input[name=email]')
-    .fill(process.env.SHOP_USER ?? 'playwright.user@oxid-esales.dev');
-  await page.locator('input[name=password]').fill(process.env.SHOP_PASSWORD ?? 'useruser');
+  await page.locator('input[name=email]').fill(process.env.SHOP_USER ?? '');
+  await page.locator('input[name=password]').fill(process.env.SHOP_PASSWORD ?? '');
   await page.locator('[data-testid="login-form"] button[type=submit]').click();
   await expect(page).not.toHaveURL(/\/login/, { timeout: 30_000 });
 }

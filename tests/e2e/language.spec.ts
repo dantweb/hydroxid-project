@@ -48,3 +48,42 @@ test(`${instance}: language dropdown follows the instance's locales`, async ({ p
   await page.locator(`[data-testid="pxd-language-option"][lang="${other}"]`).click();
   await expect(page.locator('html')).toHaveAttribute('lang', other, { timeout: 20_000 });
 });
+
+/**
+ * Sprint 139b (B4): every GraphQL request carries the shop language id (`?lang=`) of the active
+ * locale — the shop's browser-language detection is off, so the id is what picks the language.
+ * The instances declare no `shop.language_ids`, so the host default `{ de: 0, en: 1 }` applies.
+ */
+const DEFAULT_LANGUAGE_IDS: Record<string, string> = { de: '0', en: '1' };
+
+test(`${instance}: GraphQL requests carry the lang id of the active locale, before and after a switch`, async ({
+  page,
+}) => {
+  const langs: string[] = [];
+  page.on('request', (request) => {
+    if (!request.url().includes('/graphql/')) return;
+    langs.push(new URL(request.url()).searchParams.get('lang') ?? '(none)');
+  });
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+  await expect(page.getByTestId('pxd-header')).toBeVisible({ timeout: 20_000 });
+  const config = (await (await page.request.get('/oxid-config.json')).json()) as {
+    i18n?: { locales?: string[]; default_locale?: string };
+  };
+  const locales = config.i18n?.locales ?? [];
+  test.skip(locales.length < 2, 'one language: nothing to switch');
+
+  const first = (await page.locator('html').getAttribute('lang')) ?? '';
+  await expect.poll(() => langs.length).toBeGreaterThan(0);
+  expect(new Set(langs)).toEqual(new Set([DEFAULT_LANGUAGE_IDS[first]]));
+
+  const other = locales.find((code) => code !== first) ?? locales[1];
+  await page.getByTestId('pxd-language').click();
+  langs.length = 0;
+  await page.locator(`[data-testid="pxd-language-option"][lang="${other}"]`).click();
+  await expect(page.locator('html')).toHaveAttribute('lang', other, { timeout: 20_000 });
+  // a navigation inside the app after the switch asks the shop in the new language
+  await page.goto('/');
+  await expect.poll(() => langs.length).toBeGreaterThan(0);
+  expect(langs.at(-1)).toBe(DEFAULT_LANGUAGE_IDS[other]);
+});

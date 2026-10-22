@@ -15,7 +15,8 @@ const answer = (data: unknown) => ({
 
 /**
  * A minimal stand-in for the shop's GraphQL API, so the suite runs without a shop (CI).
- * Covers: anonymous + customer tokens, the account summary, empty saved lists, an empty catalogue.
+ * Covers: anonymous + customer tokens, the account summary, empty saved lists, an empty catalogue,
+ * the checkout's country list.
  */
 export async function mockShop(page: Page): Promise<void> {
   await page.route('**/graphql/**', async (route) => {
@@ -60,6 +61,17 @@ export async function mockShop(page: Page): Promise<void> {
     }
     if (query.includes('category(')) {
       return route.fulfill(answer({ category: { products: [] } }));
+    }
+    if (query.includes('countries')) {
+      return route.fulfill(
+        answer({
+          countries: [
+            { id: 'a7c40f631fc920687.20179984', title: 'Germany' },
+            { id: 'a7c40f6320aeb2ec2.72885259', title: 'Austria' },
+            { id: 'a7c40f6321c6f6109.43859248', title: 'Switzerland' },
+          ],
+        }),
+      );
     }
     if (query.includes('products')) {
       return route.fulfill(answer({ products: [], categories: [] }));

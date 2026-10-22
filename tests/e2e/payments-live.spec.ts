@@ -7,15 +7,18 @@ import {
   fillMollieCard,
   finishOnMollieTestPage,
   openPaymentStep,
+  SHOP_LOGIN_CONFIGURED,
+  SHOP_LOGIN_MISSING,
 } from './helpers/payments';
 
 /**
  * Real sandbox payments through a HydroXid instance on pay1 (Stripe test cards, Mollie test mode):
- *   LIVE=1 E2E_BASE_URL=https://pay1.oxid.dev:2053 npx playwright test payments-live --workers=1
+ *   LIVE=1 E2E_BASE_URL=https://pay1.oxid.dev:2053 SHOP_USER=… SHOP_PASSWORD=… npx playwright test payments-live --workers=1
  * Each payment runs INSIDE the checkout page (iframe mode), commits an order and shows it in the
  * account; failures leave no order and the shopper can try again.
  */
 test.skip(!process.env.LIVE || !process.env.E2E_BASE_URL, 'set LIVE=1 and E2E_BASE_URL');
+test.skip(!SHOP_LOGIN_CONFIGURED, SHOP_LOGIN_MISSING);
 test.describe.configure({ mode: 'serial' });
 
 /** Stripe can ignore a click that lands while it is still initialising: submit again until the shop's return route opens. */
