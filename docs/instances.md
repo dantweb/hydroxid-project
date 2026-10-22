@@ -29,3 +29,26 @@ language); `tests/unit/instances.spec.ts` covers the rendered keys (`shop.langua
 
 Default `false`: shoppers see the translated `errors.<code>` text only. `true` adds a collapsible block with
 the error code and raw message — for a developer's instance, never for pay1.
+
+## Checkout without an account — `checkout.guest` (sprint 140c)
+
+Default `true`: a shopper without a customer session gets the guest form at `/checkout` (e-mail, invoice
+address, "deliver elsewhere", country list from the shop), pays with the anonymous token, and the shop makes
+the guest its customer when the payment starts (payment-base 1.5). Set it per instance **only** if an
+instance should not offer guest checkout:
+
+```yaml
+checkout:
+  guest: false # /checkout redirects to the login page, as before sprint 140c
+```
+
+All three instances keep the default. Guest details live in the checkout store's memory only; what is
+stored where is in oxid-fe-user's `docs/checkout.md`. The form's texts are the host catalog's
+`checkout.guest.*` (en, de); HydroXid overrides none of them.
+
+Proof: `tests/e2e/guest-checkout.spec.ts` (mock shop, no login, one item in the basket) runs per instance
+(`INSTANCE=<name>`) on the desktop project and on the four device profiles of `playwright.config.ts`
+(iPhone 17 Pro, Galaxy S24, S25 Ultra, Z Fold 7, all in Chromium with the device's viewport/touch/user
+agent): the form renders, nothing scrolls sideways, inputs, rows and the pay button are at least 44 px
+tall. Screenshots (`SCREENSHOTS=1`): `docs/reports/guest-checkout/<instance>-desktop.png` and
+`<instance>-phone.png` (Galaxy S24).

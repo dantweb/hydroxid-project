@@ -18,6 +18,11 @@ Inherits oxid-fe-user 0.7.0 / oxid-fe-core 0.10.0 (graphql-comply sprints 138d, 
   `build/nginx-local.conf` / `build/nginx-pay1.conf`; unit test of the rendered config; `docs/ci.md` says the
   host-level nginx in front must log without the query string too. `nginx -t` verified on both rendered files.
 
+- **140c** — guest checkout inherited: e2e `guest-checkout.spec.ts` per instance on the desktop project and the
+  four device profiles (new Playwright projects, Chromium-emulated); screenshots in
+  `docs/reports/guest-checkout/`; `docs/instances.md` documents `checkout.guest` (default `true`, no instance
+  changes it); the mock shop answers `countries`.
+
 ### Changed
 
 - Dependencies: oxid-fe-core 0.10.0, oxid-fe-user 0.7.0 (`createAppRouter(registry, auth, config)`, payment
