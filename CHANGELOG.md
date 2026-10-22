@@ -23,6 +23,10 @@ Inherits oxid-fe-user 0.7.0 / oxid-fe-core 0.10.0 (graphql-comply sprints 138d, 
   `docs/reports/guest-checkout/`; `docs/instances.md` documents `checkout.guest` (default `true`, no instance
   changes it); the mock shop answers `countries`.
 
+- **139a** — `docs/ci.md`: the shop update procedure on pay1 (composer update → re-activate modules → payment-base
+  `run-migrations.sh` → `oe:graphql:cache-clear` → smoke query), the `/graphql/` rewrite check (`QSA`,
+  `skipSession=1`) with the `grep`, and the `zend.exception_ignore_args=On` note.
+
 ### Changed
 
 - Dependencies: oxid-fe-core 0.10.0, oxid-fe-user 0.7.0 (`createAppRouter(registry, auth, config)`, payment
