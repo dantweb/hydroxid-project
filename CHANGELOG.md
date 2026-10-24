@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+SEC-1 — security advisories. `happy-dom` pinned to the patched `21.0.4` (GHSA-834v-8h66-3h79). The zod advisory
+(GHSA-mrhx-c7xc-m3w5) arrives with oxid-fe-core 0.11.0 / oxid-fe-user 0.7.1 through the `#main` pins: see
+`docs/SEC-1-follow-up.md`.
+
 ## 0.10.0
 
 Inherits oxid-fe-user 0.7.0 / oxid-fe-core 0.10.0 (graphql-comply sprints 138d, 139a, 139b, 140c).
